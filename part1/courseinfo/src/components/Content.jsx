@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Content = ({ courseInfo }) => {
+const Content = ({ data }) => {
     return (
         <content>
-            <p>{ courseInfo.name } { courseInfo.exercises }</p>
+            <p>{ data.name } { data.exercises }</p>
         </content>
     )
 }
