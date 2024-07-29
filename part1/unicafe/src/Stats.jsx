@@ -1,4 +1,5 @@
 import React from 'react';
+import StatisticLine from './StatisticLine';
 
 const Stats = ({ good, neutral, bad }) => {
     const total = good + neutral + bad;
@@ -11,12 +12,12 @@ const Stats = ({ good, neutral, bad }) => {
             
             {good || neutral || bad > 0 ? (
             <ul>
-                <li>Good: {good}</li>
-                <li>Neutral: {neutral}</li>
-                <li>Bad: {bad}</li>
-                <li>Total: {total}</li>
-                <li>Average: {avgFeedback.toFixed(2)}</li>
-                <li>Positive: {posFeedback.toFixed(0)}%</li>
+                <StatisticLine text={"Good"} value={good}/>
+                <StatisticLine text={"Neutral"} value={neutral}/>
+                <StatisticLine text={"Bad"} value={bad}/>
+                <StatisticLine text={"Total"} value={total}/>
+                <StatisticLine text={"Average"} value={avgFeedback.toFixed(2)}/>
+                <StatisticLine text={"Positive"} value={`${posFeedback.toFixed(0)}%`}/>
             </ul>
             ) : (
                 <p>No feedback has been given.</p>
