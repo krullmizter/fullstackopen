@@ -4,9 +4,7 @@ const Total = ({ parts }) => {
   const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0);
 
   return (
-    <div>
-      <p>Total exercises: {totalExercises}</p>
-    </div>
+    <h3>Total exercises: {totalExercises}</h3>
   );
 };
 

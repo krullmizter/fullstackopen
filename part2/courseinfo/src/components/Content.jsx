@@ -1,10 +1,8 @@
 import React from 'react';
 
-const Content = ({ input }) => {
+const Content = ({ data }) => {
   return (
-    <div>
-      <p>{input.name} {input.exercises}</p>
-    </div>
+    <p>{data.name} {data.exercises}</p>
   );
 };
 
