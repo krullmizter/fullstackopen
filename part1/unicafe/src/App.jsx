@@ -2,14 +2,14 @@ import { useState } from 'react'
 import Stats from './Stats';
 
 const App = () => {
-  const [good, setGood] = useState(0)
-  const [neutral, setNeutral] = useState(0)
-  const [bad, setBad] = useState(0)
+  const [getGood, setGood] = useState(0)
+  const [getNeutral, setNeutral] = useState(0)
+  const [getBad, setBad] = useState(0)
 
   // State management
-  const goodClicks = () => setGood(good + 1);
-  const neutralClick = () => setNeutral(neutral + 1);
-  const badClicks = () => setBad(bad + 1);
+  const goodClicks = () => setGood(getGood + 1);
+  const neutralClick = () => setNeutral(getNeutral + 1);
+  const badClicks = () => setBad(getBad + 1);
 
   return (
     <div>
@@ -24,7 +24,7 @@ const App = () => {
         <button onClick={badClicks}>Bad</button>
       </div>
 
-      <Stats good={good} neutral={neutral} bad={bad} />
+      <Stats good={getGood} neutral={getNeutral} bad={getBad} />
     </div>
   )
 }

@@ -8,6 +8,8 @@ const Stats = ({ good, neutral, bad }) => {
     return (
         <div>
             <h2>Statistics</h2>
+            
+            {good || neutral || bad > 0 ? (
             <ul>
                 <li>Good: {good}</li>
                 <li>Neutral: {neutral}</li>
@@ -16,6 +18,9 @@ const Stats = ({ good, neutral, bad }) => {
                 <li>Average: {avgFeedback.toFixed(2)}</li>
                 <li>Positive: {posFeedback.toFixed(0)}%</li>
             </ul>
+            ) : (
+                <p>No feedback has been given.</p>
+            )}
         </div>
     );
 };
