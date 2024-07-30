@@ -19,14 +19,10 @@ app.use(
 const mongoUrl = process.env.MONGODB_URL;
 
 mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(mongoUrl, {})
   .then(() => {
     console.log(`Connected to MongoDB database: ${mongoUrl}`);
 
-    // Start the server only after the connection is established
     const PORT = process.env.PORT || 3001;
     app.listen(PORT, () => {
       console.log(`Server running on port: ${PORT}`);
@@ -34,7 +30,7 @@ mongoose
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
-    process.exit(1); // Exit the process with an error code
+    process.exit(1);
   });
 
 // Schema and Model setup
@@ -137,10 +133,4 @@ app.put("/api/persons/:id", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Failed to update person" });
   }
-});
-
-// Start the server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port: ${PORT}`);
 });
