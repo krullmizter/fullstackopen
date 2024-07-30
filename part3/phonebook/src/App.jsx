@@ -18,27 +18,12 @@ const App = () => {
   useEffect(() => {
     personService
       .getAll()
-      .then((initialPersons) => {
-        setPersons(initialPersons);
-      })
-      .catch((error) => {
-        handleError(
-          "Failed to fetch contacts from server. Hint: Start the backend.",
-          error
-        );
-      });
+      .then(setPersons)
+      .catch((error) => handleError("Failed to fetch contacts", error));
   }, []);
 
   const handleError = (message, error) => {
-    console.error("Error:", error.message);
-    if (error.response) {
-      console.warn(
-        `Response error: ${error.response.data || error.response.statusText}`
-      );
-    } else if (error.request) {
-      console.warn(`Request error: ${error.request}`);
-    }
-
+    console.error(error);
     setErrorMessage(`${message}: ${error.message}`);
     setTimeout(() => setErrorMessage(null), 8000);
   };
@@ -47,80 +32,60 @@ const App = () => {
   const handleNumberChange = (e) => setNewNumber(e.target.value);
 
   const handleNameSearch = (e) => {
-    const searchValue = e.target.value;
+    const searchValue = e.target.value.toLowerCase();
     setSearchName(searchValue);
 
-    if (searchValue.trim()) {
-      const filtered = persons.filter((person) =>
-        person.name.toLowerCase().includes(searchValue.toLowerCase())
-      );
-      setFilteredSuggestions(filtered);
-    } else {
-      setFilteredSuggestions([]);
+    const filtered = persons.filter((person) =>
+      person.name.toLowerCase().includes(searchValue)
+    );
+    setFilteredSuggestions(filtered);
+  };
+
+  const validateInputs = () => {
+    if (newName.trim() === "" || newNumber.trim() === "") {
+      setErrorMessage("Name and phone number fields cannot be empty");
+      return false;
     }
+    return true;
   };
 
   const addPerson = () => {
-    if (newName.trim() === "" || newNumber.trim() === "") {
-      handleError(
-        "Name and phone number fields cannot be empty",
-        new Error("Empty input")
-      );
-      return;
-    }
+    if (!validateInputs()) return;
 
-    const newPerson = {
-      name: newName.trim(),
-      number: newNumber.trim(),
-    };
+    const newPerson = { name: newName.trim(), number: newNumber.trim() };
 
     const existingPerson = persons.find(
-      (person) => person.name.toLowerCase() === newName.trim().toLowerCase()
+      (p) => p.name.toLowerCase() === newName.trim().toLowerCase()
     );
 
     if (existingPerson) {
       if (
         window.confirm(
-          `${newPerson.name} is already added to the phonebook. Do you want to update their phone number?`
+          `${newPerson.name} is already in the phonebook. Replace the old number with a new one?`
         )
       ) {
         personService
           .update(existingPerson.id, newPerson)
           .then((updatedPerson) => {
-            setPersons((prevPersons) =>
-              prevPersons.map((person) =>
-                person.id !== existingPerson.id
-                  ? person
-                  : { ...person, number: updatedPerson.number }
-              )
+            setPersons((prev) =>
+              prev.map((p) => (p.id !== existingPerson.id ? p : updatedPerson))
             );
             resetForm();
-            setSuccessMessage(
-              `Successfully updated ${newPerson.name}'s phone number`
-            );
+            setSuccessMessage(`Updated ${newPerson.name}'s number`);
             setTimeout(() => setSuccessMessage(null), 8000);
           })
-          .catch((error) => {
-            handleError(
-              error.response && error.response.status === 404
-                ? `${newPerson.name} was most likely removed from the server already`
-                : `There was an error updating ${newPerson.name}.`,
-              error
-            );
-          });
+          .catch((error) => handleError("Error updating contact", error));
       }
     } else {
       personService
         .create(newPerson)
         .then((createdPerson) => {
-          setPersons((prevPersons) => [...prevPersons, createdPerson]);
+          setPersons((prev) => [...prev, createdPerson]);
           resetForm();
-          setSuccessMessage(`Successfully added ${newPerson.name}`);
+          setSuccessMessage(`Added ${newPerson.name}`);
           setTimeout(() => setSuccessMessage(null), 8000);
         })
-        .catch((error) =>
-          handleError(`There was an error adding ${newPerson.name}.`, error)
-        );
+        .catch((error) => handleError("Error adding contact", error));
     }
   };
 
@@ -130,46 +95,28 @@ const App = () => {
   };
 
   const deletePerson = (id) => {
-    const person = persons.find((person) => person.id === id);
-
-    if (person) {
-      if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
-        personService
-          .remove(id)
-          .then(() => {
-            setPersons(persons.filter((person) => person.id !== id));
-            setSuccessMessage(`Successfully deleted ${person.name}`);
-            setTimeout(() => setSuccessMessage(null), 8000);
-          })
-          .catch((error) =>
-            handleError(`There was an error deleting ${person.name}.`, error)
-          );
-      } else {
-        handleError(
-          `Didn't remove ${person.name}.`,
-          new Error("User cancellation")
-        );
-      }
-    } else {
-      handleError(
-        `The user ${person.name} was not found.`,
-        new Error("User not found")
-      );
+    const person = persons.find((p) => p.id === id);
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons((prev) => prev.filter((p) => p.id !== id));
+          setSuccessMessage(`${person.name} deleted`);
+          setTimeout(() => setSuccessMessage(null), 8000);
+        })
+        .catch((error) => handleError("Error deleting contact", error));
     }
   };
 
   return (
     <main>
-      {errorMessage && (
-        <Notification notificationType="error" message={errorMessage} />
-      )}
+      {errorMessage && <Notification type="error" message={errorMessage} />}
       {successMessage && (
-        <Notification notificationType="success" message={successMessage} />
+        <Notification type="success" message={successMessage} />
       )}
 
       <section>
         <h1>Phonebook</h1>
-        <h2>Search contact name</h2>
         <Filter
           inputPlaceholder="Search by name..."
           filterValue={searchName}

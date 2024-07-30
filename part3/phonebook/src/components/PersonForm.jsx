@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 
 const PersonForm = ({
@@ -49,14 +51,6 @@ const PersonForm = ({
       </button>
     </form>
   );
-};
-
-PersonForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  nameValue: PropTypes.string.isRequired,
-  nameOnChange: PropTypes.func.isRequired,
-  numberValue: PropTypes.string.isRequired,
-  numberOnChange: PropTypes.func.isRequired,
 };
 
 export default PersonForm;

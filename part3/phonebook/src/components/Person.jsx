@@ -1,6 +1,8 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 
-const Person = ({ array, onDelete }) => {
+const Person = ({ array = [], onDelete }) => {
   return (
     <div>
       {array.length === 0 ? (
@@ -27,17 +29,6 @@ const Person = ({ array, onDelete }) => {
       )}
     </div>
   );
-};
-
-Person.propTypes = {
-  array: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default Person;

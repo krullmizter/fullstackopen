@@ -1,23 +1,89 @@
-import axios from "axios";
+const baseUrl = "http://localhost:3001/api/persons";
 
-const baseUrl = "http://localhost:3001/persons";
+const getAll = async () => {
+  try {
+    const response = await fetch(baseUrl);
 
-const getAll = () => {
-  return axios.get(baseUrl).then((response) => response.data);
+    const contentType = response.headers.get("Content-Type");
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      throw new Error("Received non-JSON response");
+    }
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
 };
 
-const create = (newPerson) => {
-  return axios.post(baseUrl, newPerson).then((response) => response.data);
+const create = async (newPerson) => {
+  try {
+    const response = await fetch(baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newPerson),
+    });
+
+    const contentType = response.headers.get("Content-Type");
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      throw new Error("Received non-JSON response");
+    }
+  } catch (error) {
+    console.error("Error creating person:", error);
+    throw error;
+  }
 };
 
-const update = (id, updatedPerson) => {
-  return axios
-    .put(`${baseUrl}/${id}`, updatedPerson)
-    .then((response) => response.data);
+const update = async (id, updatedPerson) => {
+  try {
+    const response = await fetch(`${baseUrl}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedPerson),
+    });
+
+    const contentType = response.headers.get("Content-Type");
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      throw new Error("Received non-JSON response");
+    }
+  } catch (error) {
+    console.error("Error updating person:", error);
+    throw error;
+  }
 };
 
-const remove = (id) => {
-  return axios.delete(`${baseUrl}/${id}`).then(() => id);
+const remove = async (id) => {
+  try {
+    const response = await fetch(`${baseUrl}/${id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return response.status === 204 ? null : await response.json();
+  } catch (error) {
+    console.error("Error deleting person:", error);
+    throw error;
+  }
 };
 
 export default {

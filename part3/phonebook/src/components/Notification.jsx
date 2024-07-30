@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 
 const Notification = ({ notificationType, message }) => {
@@ -6,16 +8,6 @@ const Notification = ({ notificationType, message }) => {
   }
 
   return <div className={`notification ${notificationType}`}>{message}</div>;
-};
-
-Notification.propTypes = {
-  notificationType: PropTypes.oneOf(["error", "success", "notification"])
-    .isRequired,
-  message: PropTypes.string,
-};
-
-Notification.defaultProps = {
-  message: null,
 };
 
 export default Notification;

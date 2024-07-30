@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
@@ -5,7 +7,7 @@ const Filter = ({
   inputPlaceholder,
   filterValue,
   filterChange,
-  filterSuggestions,
+  filterSuggestions = [],
 }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const filterInputRef = useRef(null);
@@ -77,18 +79,6 @@ const Filter = ({
       )}
     </div>
   );
-};
-
-Filter.propTypes = {
-  inputPlaceholder: PropTypes.string.isRequired,
-  filterValue: PropTypes.string.isRequired,
-  filterChange: PropTypes.func.isRequired,
-  filterSuggestions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
 };
 
 export default Filter;
