@@ -1,7 +1,7 @@
-PUT http://localhost:3001/api/persons/1 HTTP/1.1
+PUT https://fullstackopen-2agf.onrender.com/api/persons/1 HTTP/1.1
 content-type: application/json
 
 {
-    "name": "123",
+    "name": "Test",
     "number": "1245"
 }
