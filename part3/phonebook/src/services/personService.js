@@ -1,4 +1,4 @@
-const baseUrl = "http://localhost:3001/api/persons";
+const baseUrl = "https://fullstackopen-2agf.onrender.com/api/persons";
 
 const getAll = async () => {
   try {

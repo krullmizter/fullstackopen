@@ -1,12 +1,9 @@
-# React + Vite
+# Phonebook Frontend WebApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Built using: Vite + React
 
-Currently, two official plugins are available:
+### Backend
+The backend is deployed at [https://fullstackopen-2agf.onrender.com](https://fullstackopen-2agf.onrender.com).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
----
-
-Backend running on: [Render.com](https://fullstackopen-2agf.onrender.com)
+### Frontend
+The frontend is deployed at [https://fullstackopen-part3-phonebook-jqxr.onrender.com](https://fullstackopen-part3-phonebook-jqxr.onrender.com).

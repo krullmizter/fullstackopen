@@ -2,12 +2,12 @@
 /* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 
-const Notification = ({ notificationType, message }) => {
-  if (!message) {
-    return null;
-  }
+const Notification = ({ type, message }) => {
+  if (!message) return null;
 
-  return <div className={`notification ${notificationType}`}>{message}</div>;
+  const notificationClass = `notification ${type}`;
+
+  return <div className={notificationClass}>{message}</div>;
 };
 
 export default Notification;

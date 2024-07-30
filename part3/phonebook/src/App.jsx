@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import "./assets/App.css";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
@@ -6,44 +6,58 @@ import Person from "./components/Person";
 import personService from "./services/personService";
 import Notification from "./components/Notification";
 
+const TIMEOUT = 8000;
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchName, setSearchName] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [notification, setNotification] = useState({
+    type: null,
+    message: null,
+  });
 
   useEffect(() => {
     personService
       .getAll()
       .then(setPersons)
-      .catch((error) => handleError("Failed to fetch contacts", error));
+      .catch((error) =>
+        handleNotification(
+          "error",
+          `Failed to fetch contacts: ${error.message}`
+        )
+      );
   }, []);
 
-  const handleError = (message, error) => {
-    console.error(error);
-    setErrorMessage(`${message}: ${error.message}`);
-    setTimeout(() => setErrorMessage(null), 8000);
-  };
+  const handleNotification = useCallback((type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification({ type: null, message: null }), TIMEOUT);
+  }, []);
 
   const handleNameChange = (e) => setNewName(e.target.value);
   const handleNumberChange = (e) => setNewNumber(e.target.value);
 
-  const handleNameSearch = (e) => {
-    const searchValue = e.target.value.toLowerCase();
-    setSearchName(searchValue);
-
-    const filtered = persons.filter((person) =>
-      person.name.toLowerCase().includes(searchValue)
-    );
-    setFilteredSuggestions(filtered);
-  };
+  const handleNameSearch = useCallback(
+    (e) => {
+      const searchValue = e.target.value.toLowerCase();
+      setSearchName(searchValue);
+      setFilteredSuggestions(
+        persons.filter((person) =>
+          person.name.toLowerCase().includes(searchValue)
+        )
+      );
+    },
+    [persons]
+  );
 
   const validateInputs = () => {
     if (newName.trim() === "" || newNumber.trim() === "") {
-      setErrorMessage("Name and phone number fields cannot be empty");
+      handleNotification(
+        "error",
+        "Name and phone number fields cannot be empty"
+      );
       return false;
     }
     return true;
@@ -53,7 +67,6 @@ const App = () => {
     if (!validateInputs()) return;
 
     const newPerson = { name: newName.trim(), number: newNumber.trim() };
-
     const existingPerson = persons.find(
       (p) => p.name.toLowerCase() === newName.trim().toLowerCase()
     );
@@ -71,10 +84,17 @@ const App = () => {
               prev.map((p) => (p.id !== existingPerson.id ? p : updatedPerson))
             );
             resetForm();
-            setSuccessMessage(`Updated ${newPerson.name}'s number`);
-            setTimeout(() => setSuccessMessage(null), 8000);
+            handleNotification(
+              "success",
+              `Updated the phone number of ${newPerson.name}`
+            );
           })
-          .catch((error) => handleError("Error updating contact", error));
+          .catch((error) =>
+            handleNotification(
+              "error",
+              `Error updating contact: ${error.message}`
+            )
+          );
       }
     } else {
       personService
@@ -82,10 +102,11 @@ const App = () => {
         .then((createdPerson) => {
           setPersons((prev) => [...prev, createdPerson]);
           resetForm();
-          setSuccessMessage(`Added ${newPerson.name}`);
-          setTimeout(() => setSuccessMessage(null), 8000);
+          handleNotification("success", `Added ${newPerson.name}`);
         })
-        .catch((error) => handleError("Error adding contact", error));
+        .catch((error) =>
+          handleNotification("error", `Error adding contact: ${error.message}`)
+        );
     }
   };
 
@@ -101,18 +122,21 @@ const App = () => {
         .remove(id)
         .then(() => {
           setPersons((prev) => prev.filter((p) => p.id !== id));
-          setSuccessMessage(`${person.name} deleted`);
-          setTimeout(() => setSuccessMessage(null), 8000);
+          handleNotification("success", `${person.name} was deleted`);
         })
-        .catch((error) => handleError("Error deleting contact", error));
+        .catch((error) =>
+          handleNotification(
+            "error",
+            `Error deleting ${person.name}: ${error.message}`
+          )
+        );
     }
   };
 
   return (
     <main>
-      {errorMessage && <Notification type="error" message={errorMessage} />}
-      {successMessage && (
-        <Notification type="success" message={successMessage} />
+      {notification.message && (
+        <Notification type={notification.type} message={notification.message} />
       )}
 
       <section>
