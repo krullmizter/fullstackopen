@@ -21,7 +21,7 @@ const PersonForm = ({
             <input value={numberValue} onChange={numberOnChange} />
           </label>
         </p>
-        <button type="submit">Add contact</button>
+        <button type="submit">Add/Update</button>
       </form>
     </div>
   );
