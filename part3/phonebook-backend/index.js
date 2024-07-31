@@ -111,7 +111,6 @@ app.delete("/api/persons/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid ID format" });
     }
 
-    // Find and remove the person by ID
     const result = await Person.findByIdAndRemove(req.params.id);
 
     if (!result) {

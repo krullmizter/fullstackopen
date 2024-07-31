@@ -116,12 +116,17 @@ const App = () => {
   };
 
   const deletePerson = (id) => {
-    const person = persons.find((p) => p._id.$oid === id);
+    const person = persons.find((p) => p._id && p._id.$oid === id);
+    if (!person) {
+      console.error("Person not found");
+      return;
+    }
+
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .remove(person._id.$oid)
         .then(() => {
-          setPersons((prev) => prev.filter((p) => p._id.$oid !== id));
+          setPersons((prev) => prev.filter((p) => p._id && p._id.$oid !== id));
           handleNotification("success", `${person.name} was deleted`);
         })
         .catch((error) =>
