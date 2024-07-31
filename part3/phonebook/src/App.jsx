@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Notification, Filter, PersonForm, Person } from "./components";
 import { personService } from "./services";
+import DOMPurify from 'dompurify';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -19,14 +20,15 @@ const App = () => {
     const { name, value } = event.target;
     setFormState((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: DOMPurify.sanitize(value),
     }));
   };
 
   const handleNameSearch = (event) => {
-    setSearchName(event.target.value);
+    const sanitizedValue = DOMPurify.sanitize(event.target.value);
+    setSearchName(sanitizedValue);
     const suggestions = persons.filter((person) =>
-      person.name.toLowerCase().includes(event.target.value.toLowerCase())
+      person.name.toLowerCase().includes(sanitizedValue.toLowerCase())
     );
     setFilteredSuggestions(suggestions);
   };
@@ -71,10 +73,10 @@ const App = () => {
             );
             handleNotification("success", `Updated ${returnedPerson.name}`);
           })
-          .catch((error) => {
+          .catch(() => {
             handleNotification(
               "error",
-              `Error updating ${existingPerson.name}: ${error.response.data.error}`
+              `Error updating ${existingPerson.name}`
             );
           });
       }
@@ -85,10 +87,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson));
           handleNotification("success", `Added ${returnedPerson.name}`);
         })
-        .catch((error) => {
+        .catch(() => {
           handleNotification(
             "error",
-            `Error adding ${personObject.name}: ${error.response.data.error}`
+            `Error adding ${personObject.name}`
           );
         });
     }
@@ -110,10 +112,10 @@ const App = () => {
           setPersons((prev) => prev.filter((p) => p.id !== id));
           handleNotification("success", `${person.name} was deleted`);
         })
-        .catch((error) =>
+        .catch(() =>
           handleNotification(
             "error",
-            `Error deleting ${person.name}: ${error.message}`
+            `Error deleting ${person.name}`
           )
         );
     }

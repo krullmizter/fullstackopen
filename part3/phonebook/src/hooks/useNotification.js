@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 
 const TIMEOUT = 8000;
 
@@ -8,10 +8,13 @@ const useNotification = () => {
     message: null,
   });
 
-  const handleNotification = useCallback((type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification({ type: null, message: null }), TIMEOUT);
-  }, []);
+  const handleNotification = (type, message) => {
+    const sanitizedMessage = message.replace(/<[^>]*>?/gm, '');
+    setNotification({ type, message: sanitizedMessage });
+    setTimeout(() => {
+      setNotification({ type: "", message: "" });
+    }, TIMEOUT);
+  };
 
   return [notification, handleNotification];
 };

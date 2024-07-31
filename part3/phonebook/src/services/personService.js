@@ -1,4 +1,7 @@
-const baseUrl = "https://fullstackopen-2agf.onrender.com/api/persons";
+import sanitizeHtml from 'sanitize-html';
+
+//const baseUrl = "https://fullstackopen-2agf.onrender.com/api/persons";
+const baseUrl = "http://localhost:3001/api/persons";
 
 const checkResponse = async (response) => {
   const contentType = response.headers.get("Content-Type");
@@ -21,6 +24,20 @@ const fetchOptions = (method, body) => ({
   body: JSON.stringify(body),
 });
 
+const validatePerson = (person) => {
+  if (!person.name || typeof person.name !== 'string') {
+    throw new Error("Invalid name");
+  }
+  if (!person.number || typeof person.number !== 'string') {
+    throw new Error("Invalid number");
+  }
+};
+
+const sanitizePerson = (person) => ({
+  name: sanitizeHtml(person.name),
+  number: sanitizeHtml(person.number),
+});
+
 const getAll = async () => {
   try {
     const response = await fetch(baseUrl);
@@ -33,7 +50,9 @@ const getAll = async () => {
 
 const create = async (newPerson) => {
   try {
-    const response = await fetch(baseUrl, fetchOptions("POST", newPerson));
+    validatePerson(newPerson);
+    const sanitizedPerson = sanitizePerson(newPerson);
+    const response = await fetch(baseUrl, fetchOptions("POST", sanitizedPerson));
     return await checkResponse(response);
   } catch (error) {
     console.error("Error creating person:", error);
@@ -43,9 +62,11 @@ const create = async (newPerson) => {
 
 const update = async (id, updatedPerson) => {
   try {
+    validatePerson(updatedPerson);
+    const sanitizedPerson = sanitizePerson(updatedPerson);
     const response = await fetch(
       `${baseUrl}/${id}`,
-      fetchOptions("PUT", updatedPerson)
+      fetchOptions("PUT", sanitizedPerson)
     );
     return await checkResponse(response);
   } catch (error) {

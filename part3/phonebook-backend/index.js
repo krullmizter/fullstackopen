@@ -4,14 +4,26 @@ require('dotenv').config()
 const Person = require('./models/personModel')
 const { errorHandler, commonMiddleware, logger } = require('./middleware')
 const cors = require('cors')
+const { body, validationResult, param } = require('express-validator')
+const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
 
 const app = express()
 
 // Middleware
 app.use(cors())
 app.use(express.json())
+app.use(helmet())
 commonMiddleware(app)
 logger(app)
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP, please try again later'
+})
+
+app.use(limiter)
 
 // MongoDB connection setup
 const mongoUrl = process.env.MONGODB_URL
@@ -55,7 +67,14 @@ app.get('/info', async (req, res, next) => {
   }
 })
 
-app.get('/api/persons/:id', async (req, res, next) => {
+app.get('/api/persons/:id', [
+  param('id').isMongoId().withMessage('Invalid ID format')
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
   try {
     const person = await Person.findById(req.params.id)
     if (person) {
@@ -68,24 +87,16 @@ app.get('/api/persons/:id', async (req, res, next) => {
   }
 })
 
-app.post('/api/persons', async (req, res, next) => {
+app.post('/api/persons', [
+  body('name').isLength({ min: 3 }).trim().escape(),
+  body('number').matches(/^\d{2,3}-\d+$/).isLength({ min: 8 }).trim().escape(),
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
   const { name, number } = req.body
-
-  if (!name || !number) {
-    return res.status(400).json({ error: 'Name or number is missing!' })
-  } else if (name.length < 3) {
-    return res
-      .status(400)
-      .json({ error: 'Name must be at least 3 characters long' })
-  }
-
-  const validateNumber = /^\d{2,3}-\d+$/
-  if (!validateNumber.test(number) || number.length < 8) {
-    return res.status(400).json({
-      error:
-        'Phone number must be in the format XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long',
-    })
-  }
 
   try {
     const newPerson = new Person({ name, number })
@@ -96,24 +107,17 @@ app.post('/api/persons', async (req, res, next) => {
   }
 })
 
-app.put('/api/persons/:id', async (req, res, next) => {
+app.put('/api/persons/:id', [
+  param('id').isMongoId().withMessage('Invalid ID format'),
+  body('name').isLength({ min: 3 }).trim().escape(),
+  body('number').matches(/^\d{2,3}-\d+$/).isLength({ min: 8 }).trim().escape(),
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
+
   const { name, number } = req.body
-
-  if (!name || !number) {
-    return res.status(400).json({ error: 'Name or number is missing!' })
-  } else if (name.length < 3) {
-    return res
-      .status(400)
-      .json({ error: 'Name must be at least 3 characters long' })
-  }
-
-  const validateNumber = /^\d{2,3}-\d+$/
-  if (!validateNumber.test(number) || number.length < 8) {
-    return res.status(400).json({
-      error:
-        'Phone number must be in the format XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long',
-    })
-  }
 
   try {
     const updatedPerson = await Person.findByIdAndUpdate(
@@ -131,20 +135,19 @@ app.put('/api/persons/:id', async (req, res, next) => {
   }
 })
 
-app.delete('/api/persons/:id', async (req, res, next) => {
-  const personId = req.params.id
+app.delete('/api/persons/:id', [
+  param('id').isMongoId().withMessage('Invalid ID format')
+], async (req, res, next) => {
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() })
+  }
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(personId)) {
-      return res.status(400).json({ error: 'Invalid ID format' })
-    }
-
-    const result = await Person.findByIdAndDelete(personId)
-
+    const result = await Person.findByIdAndDelete(req.params.id)
     if (!result) {
       return res.status(404).json({ error: 'Person not found' })
     }
-
     res.status(204).end()
   } catch (error) {
     next(error)
