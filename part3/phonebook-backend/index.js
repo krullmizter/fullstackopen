@@ -82,7 +82,7 @@ app.get("/api/persons/:id", async (req, res) => {
     if (person) {
       res.json(person);
     } else {
-      console.log(res);
+      console.log(`Person not found with ID: ${req.params.id}`);
       res.status(404).json({ error: "Person not found" });
     }
   } catch (error) {
@@ -109,16 +109,17 @@ app.post("/api/persons", async (req, res) => {
 });
 
 app.delete("/api/persons/:id", async (req, res) => {
-  console.log(req.params.id);
+  console.log(`Attempting to delete person with ID: ${req.params.id}`);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
 
-    const result = await Person.findAndDelete(req.params.id);
+    const result = await Person.findByIdAndDelete(req.params.id);
 
     if (!result) {
+      console.log(`Person not found with ID: ${req.params.id}`);
       return res.status(404).json({ error: "Person not found" });
     }
 
