@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import PropTypes from "prop-types";
 
 const Person = ({ array = [], onDelete }) => {
@@ -11,13 +9,13 @@ const Person = ({ array = [], onDelete }) => {
         </p>
       ) : (
         array.map((person) => (
-          <div key={person.id} className="person-item">
+          <div key={person.id} className="list__item">
             <ul className="person-info">
-              <li>Name: {person.name} </li>
+              <li>Name: {person.name}</li>
               <li className="person-number">Number: {person.number}</li>
             </ul>
             <button
-              className="button delete"
+              className="button button--delete"
               type="button"
               onClick={() => onDelete(person.id)}
               aria-label={`Delete ${person.name}`}
@@ -29,6 +27,16 @@ const Person = ({ array = [], onDelete }) => {
       )}
     </div>
   );
+};
+
+Person.propTypes = {
+  array: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default Person;

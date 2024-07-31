@@ -15,6 +15,12 @@ const checkResponse = async (response) => {
   }
 };
 
+const fetchOptions = (method, body) => ({
+  method,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body),
+});
+
 const getAll = async () => {
   try {
     const response = await fetch(baseUrl);
@@ -27,11 +33,7 @@ const getAll = async () => {
 
 const create = async (newPerson) => {
   try {
-    const response = await fetch(baseUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newPerson),
-    });
+    const response = await fetch(baseUrl, fetchOptions("POST", newPerson));
     return await checkResponse(response);
   } catch (error) {
     console.error("Error creating person:", error);
@@ -41,27 +43,23 @@ const create = async (newPerson) => {
 
 const update = async (id, updatedPerson) => {
   try {
-    const response = await fetch(`${baseUrl}/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedPerson),
-    });
+    const response = await fetch(
+      `${baseUrl}/${id}`,
+      fetchOptions("PUT", updatedPerson)
+    );
     return await checkResponse(response);
   } catch (error) {
-    console.error("Error updating person:", error);
+    console.error(`Error updating person with id ${id}:`, error);
     throw error;
   }
 };
 
 const remove = async (id) => {
   try {
-    const response = await fetch(`${baseUrl}/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-    });
+    const response = await fetch(`${baseUrl}/${id}`, fetchOptions("DELETE"));
     return response.status === 204 ? null : await checkResponse(response);
   } catch (error) {
-    console.error("Error deleting person:", error);
+    console.error(`Error deleting person with id ${id}:`, error);
     throw error;
   }
 };

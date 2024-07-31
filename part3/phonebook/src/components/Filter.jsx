@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
@@ -38,7 +36,7 @@ const Filter = ({
   };
 
   return (
-    <div>
+    <div className="input-container">
       <label htmlFor="filter-input">
         Name
         <br />
@@ -61,24 +59,26 @@ const Filter = ({
               &times;
             </button>
           )}
+          {isDropdownVisible && (
+            <ul ref={dropdownRef} className="dropdown">
+              {filterSuggestions.map((suggestion, index) => (
+                <li key={index} className="dropdown-item">
+                  {suggestion.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </label>
-      {isDropdownVisible && filterSuggestions.length > 0 && (
-        <div className="autocomplete-dropdown" ref={dropdownRef} role="listbox">
-          {filterSuggestions.map((suggestion) => (
-            <div
-              key={suggestion.id}
-              className="suggestion-item"
-              role="option"
-              aria-selected="false"
-            >
-              {suggestion.name}
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
+};
+
+Filter.propTypes = {
+  inputPlaceholder: PropTypes.string.isRequired,
+  filterValue: PropTypes.string.isRequired,
+  filterChange: PropTypes.func.isRequired,
+  filterSuggestions: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 export default Filter;

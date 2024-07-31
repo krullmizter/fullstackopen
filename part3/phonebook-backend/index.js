@@ -1,19 +1,17 @@
 const express = require("express");
-const cors = require("cors");
-const morgan = require("morgan");
 const mongoose = require("mongoose");
 require("dotenv").config();
+const Person = require("./models/person");
+const { errorHandler, commonMiddleware, logger } = require("./middleware");
+const cors = require("cors");
+
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-
-// Morgan setup
-morgan.token("body", (req) => JSON.stringify(req.body));
-app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
-);
+commonMiddleware(app);
+logger(app);
 
 // MongoDB connection setup
 const mongoUrl = process.env.MONGODB_URL;
@@ -34,34 +32,17 @@ mongoose
     process.exit(1);
   });
 
-// Schema and Model setup
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-personSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-const Person = mongoose.model("Person", personSchema);
-
 // Routes
-app.get("/api/persons", async (req, res) => {
+app.get("/api/persons", async (req, res, next) => {
   try {
     const persons = await Person.find({});
     res.json(persons);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch persons" });
+    next(error);
   }
 });
 
-app.get("/info", async (req, res) => {
+app.get("/info", async (req, res, next) => {
   try {
     const persons = await Person.find({});
     res.send(
@@ -70,12 +51,11 @@ app.get("/info", async (req, res) => {
       } people</p><p>${new Date()}</p>`
     );
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch info" });
+    next(error);
   }
 });
 
-app.get("/api/persons/:id", async (req, res) => {
+app.get("/api/persons/:id", async (req, res, next) => {
   try {
     const person = await Person.findById(req.params.id);
     if (person) {
@@ -84,12 +64,11 @@ app.get("/api/persons/:id", async (req, res) => {
       res.status(404).json({ error: "Person not found" });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch person" });
+    next(error);
   }
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
 
   if (!name || !number) {
@@ -101,12 +80,11 @@ app.post("/api/persons", async (req, res) => {
     const savedPerson = await newPerson.save();
     res.status(201).json(savedPerson);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to add person" });
+    next(error);
   }
 });
 
-app.put("/api/persons/:id", async (req, res) => {
+app.put("/api/persons/:id", async (req, res, next) => {
   const { name, number } = req.body;
 
   if (!name || !number) {
@@ -125,12 +103,11 @@ app.put("/api/persons/:id", async (req, res) => {
       res.status(404).json({ error: "Person not found" });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to update person" });
+    next(error);
   }
 });
 
-app.delete("/api/persons/:id", async (req, res) => {
+app.delete("/api/persons/:id", async (req, res, next) => {
   const personId = req.params.id;
 
   try {
@@ -146,7 +123,8 @@ app.delete("/api/persons/:id", async (req, res) => {
 
     res.status(204).end();
   } catch (error) {
-    console.error(`Failed to delete person with ID: ${personId}`, error);
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 });
+
+app.use(errorHandler);

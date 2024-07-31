@@ -1,123 +1,90 @@
-import { useState, useEffect, useCallback } from "react";
-import "./assets/App.css";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import Person from "./components/Person";
-import personService from "./services/personService";
-import Notification from "./components/Notification";
-
-const TIMEOUT = 8000;
+import { useState, useEffect } from "react";
+import { Notification, Filter, PersonForm, Person } from "./components";
+import { personService } from "./services";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
+  const [formState, setFormState] = useState({ newName: "", newNumber: "" });
   const [searchName, setSearchName] = useState("");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
-  const [notification, setNotification] = useState({
-    type: null,
-    message: null,
-  });
+  const [notification, setNotification] = useState({ message: "", type: "" });
 
   useEffect(() => {
-    personService
-      .getAll()
-      .then(setPersons)
-      .catch((error) =>
-        handleNotification(
-          "error",
-          `Failed to fetch contacts: ${error.message}`
-        )
-      );
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+    });
   }, []);
 
-  const handleNotification = useCallback((type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => setNotification({ type: null, message: null }), TIMEOUT);
-  }, []);
-
-  const handleNameChange = (e) => setNewName(e.target.value);
-  const handleNumberChange = (e) => setNewNumber(e.target.value);
-
-  const handleNameSearch = useCallback(
-    (e) => {
-      const searchValue = e.target.value.toLowerCase();
-      setSearchName(searchValue);
-      setFilteredSuggestions(
-        persons.filter((person) =>
-          person.name.toLowerCase().includes(searchValue)
-        )
-      );
-    },
-    [persons]
-  );
-
-  const validateInputs = () => {
-    if (newName.trim() === "" || newNumber.trim() === "") {
-      handleNotification(
-        "error",
-        "Name and phone number fields cannot be empty"
-      );
-      return false;
-    }
-    return true;
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
-  const addPerson = () => {
-    if (!validateInputs()) return;
-
-    const newPerson = { name: newName.trim(), number: newNumber.trim() };
-    const existingPerson = persons.find(
-      (p) => p.name.toLowerCase() === newName.trim().toLowerCase()
+  const handleNameSearch = (event) => {
+    setSearchName(event.target.value);
+    const suggestions = persons.filter((person) =>
+      person.name.toLowerCase().includes(event.target.value.toLowerCase())
     );
+    setFilteredSuggestions(suggestions);
+  };
 
+  const addPerson = (event) => {
+    event.preventDefault();
+    console.log("Form submitted"); // Debug log
+    const personObject = {
+      name: formState.newName,
+      number: formState.newNumber,
+    };
+
+    const existingPerson = persons.find(
+      (person) => person.name === formState.newName
+    );
     if (existingPerson) {
       if (
         window.confirm(
-          `${newPerson.name} is already in the phonebook. Replace the old number with a new one?`
+          `${formState.newName} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
         personService
-          .update(existingPerson.id, newPerson)
-          .then((updatedPerson) => {
-            setPersons((prev) =>
-              prev.map((p) => (p.id !== existingPerson.id ? p : updatedPerson))
+          .update(existingPerson.id, personObject)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== existingPerson.id ? person : returnedPerson
+              )
             );
-            resetForm();
-            handleNotification(
-              "success",
-              `Updated the phone number of ${newPerson.name}`
-            );
+            handleNotification("success", `Updated ${returnedPerson.name}`);
           })
-          .catch((error) =>
+          .catch((error) => {
             handleNotification(
               "error",
-              `Error updating contact: ${error.message}`
-            )
-          );
+              `Error updating ${existingPerson.name}: ${error.message}`
+            );
+          });
       }
     } else {
       personService
-        .create(newPerson)
-        .then((createdPerson) => {
-          setPersons((prev) => [...prev, createdPerson]);
-          resetForm();
-          handleNotification("success", `Added ${newPerson.name}`);
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          handleNotification("success", `Added ${returnedPerson.name}`);
         })
-        .catch((error) =>
-          handleNotification("error", `Error adding contact: ${error.message}`)
-        );
+        .catch((error) => {
+          handleNotification(
+            "error",
+            `Error adding ${personObject.name}: ${error.message}`
+          );
+        });
     }
-  };
 
-  const resetForm = () => {
-    setNewName("");
-    setNewNumber("");
+    setFormState({ newName: "", newNumber: "" });
   };
 
   const deletePerson = (id) => {
     const person = persons.find((p) => p.id === id);
-    console.log(persons);
     if (!person) {
       console.error("Person not found");
       return;
@@ -139,14 +106,21 @@ const App = () => {
     }
   };
 
+  const handleNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => {
+      setNotification({ type: "", message: "" });
+    }, 5000);
+  };
+
   return (
-    <main>
+    <main className="app">
       {notification.message && (
         <Notification type={notification.type} message={notification.message} />
       )}
 
-      <section>
-        <h1>Phonebook</h1>
+      <section className="app__section">
+        <h1 className="app__title">Phonebook</h1>
         <Filter
           inputPlaceholder="Search by name..."
           filterValue={searchName}
@@ -155,19 +129,19 @@ const App = () => {
         />
       </section>
 
-      <section>
-        <h2>Add a new contact</h2>
+      <section className="app__section">
+        <h2 className="app__subtitle">Add a new contact</h2>
         <PersonForm
           onSubmit={addPerson}
-          nameValue={newName}
-          nameOnChange={handleNameChange}
-          numberValue={newNumber}
-          numberOnChange={handleNumberChange}
+          nameValue={formState.newName}
+          nameOnChange={handleFormChange}
+          numberValue={formState.newNumber}
+          numberOnChange={handleFormChange}
         />
       </section>
 
-      <section>
-        <h2>Contacts</h2>
+      <section className="app__section">
+        <h2 className="app__subtitle">Contacts</h2>
         <Person array={persons} onDelete={deletePerson} />
       </section>
     </main>
