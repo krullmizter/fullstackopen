@@ -19,6 +19,7 @@ app.use(
 const mongoUrl = process.env.MONGODB_URL;
 
 mongoose
+  .set("strictQuery", false)
   .connect(mongoUrl, {})
   .then(() => {
     console.log(`Connected to MongoDB database: ${mongoUrl}`);
@@ -77,9 +78,11 @@ app.get("/info", async (req, res) => {
 app.get("/api/persons/:id", async (req, res) => {
   try {
     const person = await Person.findById(req.params.id);
+    console.log(person);
     if (person) {
       res.json(person);
     } else {
+      console.log(res);
       res.status(404).json({ error: "Person not found" });
     }
   } catch (error) {
@@ -110,6 +113,10 @@ app.delete("/api/persons/:id", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
+
+    const person = await Person.findById(req.params.id);
+
+    console.log(person);
 
     const result = await Person.findByIdAndRemove(req.params.id);
 
