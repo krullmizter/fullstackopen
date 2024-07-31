@@ -33,19 +33,32 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
-    console.log("Form submitted"); // Debug log
+    const { newName, newNumber } = formState;
+
+    if (newName.length < 3) {
+      handleNotification("error", "Name must be at least 3 characters long");
+      return;
+    }
+
+    const numberReg = /^\d{2,3}-\d+$/;
+    if (!numberReg.test(newNumber) || newNumber.length < 8) {
+      handleNotification(
+        "error",
+        "Phone number must be in the format: XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long"
+      );
+      return;
+    }
+
     const personObject = {
-      name: formState.newName,
-      number: formState.newNumber,
+      name: newName,
+      number: newNumber,
     };
 
-    const existingPerson = persons.find(
-      (person) => person.name === formState.newName
-    );
+    const existingPerson = persons.find((person) => person.name === newName);
     if (existingPerson) {
       if (
         window.confirm(
-          `${formState.newName} is already added to phonebook, replace the old number with a new one?`
+          `${newName} is already added to phonebook, replace the old number with a new one?`
         )
       ) {
         personService
@@ -61,7 +74,7 @@ const App = () => {
           .catch((error) => {
             handleNotification(
               "error",
-              `Error updating ${existingPerson.name}: ${error.message}`
+              `Error updating ${existingPerson.name}: ${error.response.data.error}`
             );
           });
       }
@@ -75,7 +88,7 @@ const App = () => {
         .catch((error) => {
           handleNotification(
             "error",
-            `Error adding ${personObject.name}: ${error.message}`
+            `Error adding ${personObject.name}: ${error.response.data.error}`
           );
         });
     }

@@ -1,8 +1,23 @@
 const mongoose = require("mongoose");
 
+const validateNumber = {
+  validator: function (v) {
+    return /^\d{2,3}-\d+$/.test(v) && v.length >= 8;
+  },
+  message: (props) => `${props.value} is not a valid phone number!`,
+};
+
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    required: true,
+    minlength: 3,
+  },
+  number: {
+    type: String,
+    required: true,
+    validate: validateNumber,
+  },
 });
 
 personSchema.set("toJSON", {

@@ -73,6 +73,18 @@ app.post("/api/persons", async (req, res, next) => {
 
   if (!name || !number) {
     return res.status(400).json({ error: "Name or number is missing!" });
+  } else if (name.length < 3) {
+    return res
+      .status(400)
+      .json({ error: "Name must be at least 3 characters long" });
+  }
+
+  const validateNumber = /^\d{2,3}-\d+$/;
+  if (!validateNumber.test(number) || number.length < 8) {
+    return res.status(400).json({
+      error:
+        "Phone number must be in the format XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long",
+    });
   }
 
   try {
@@ -89,6 +101,18 @@ app.put("/api/persons/:id", async (req, res, next) => {
 
   if (!name || !number) {
     return res.status(400).json({ error: "Name or number is missing!" });
+  } else if (name.length < 3) {
+    return res
+      .status(400)
+      .json({ error: "Name must be at least 3 characters long" });
+  }
+
+  const validateNumber = /^\d{2,3}-\d+$/;
+  if (!validateNumber.test(number) || number.length < 8) {
+    return res.status(400).json({
+      error:
+        "Phone number must be in the format XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long",
+    });
   }
 
   try {
