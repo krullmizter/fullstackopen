@@ -1,9 +1,9 @@
-const cors = require("cors");
-const express = require("express");
+const cors = require('cors')
+const express = require('express')
 
 const commonMiddleware = (app) => {
-  app.use(cors());
-  app.use(express.json());
-};
+  app.use(cors())
+  app.use(express.json())
+}
 
-module.exports = commonMiddleware;
+module.exports = commonMiddleware
