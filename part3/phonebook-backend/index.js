@@ -105,13 +105,26 @@ app.post("/api/persons", async (req, res) => {
   }
 });
 
+const mongoose = require("mongoose");
+
 app.delete("/api/persons/:id", async (req, res) => {
   try {
-    await Person.findByIdAndRemove(req.params.id);
+    // Ensure ID is valid
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    // Find and remove the person by ID
+    const result = await Person.findByIdAndRemove(req.params.id);
+
+    if (!result) {
+      return res.status(404).json({ error: "Person not found" });
+    }
+
     res.status(204).end();
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to delete person" });
+    console.error("Failed to delete person:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
