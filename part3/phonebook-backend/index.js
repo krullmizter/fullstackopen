@@ -105,11 +105,8 @@ app.post("/api/persons", async (req, res) => {
   }
 });
 
-const mongoose = require("mongoose");
-
 app.delete("/api/persons/:id", async (req, res) => {
   try {
-    // Ensure ID is valid
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
