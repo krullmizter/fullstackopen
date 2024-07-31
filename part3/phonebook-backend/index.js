@@ -109,16 +109,14 @@ app.post("/api/persons", async (req, res) => {
 });
 
 app.delete("/api/persons/:id", async (req, res) => {
+  console.log(req.params.id);
+
   try {
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid ID format" });
     }
 
-    const person = await Person.findById(req.params.id);
-
-    console.log(person);
-
-    const result = await Person.findByIdAndDelete(req.params.id);
+    const result = await Person.findAndDelete(req.params.id);
 
     if (!result) {
       return res.status(404).json({ error: "Person not found" });
