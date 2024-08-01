@@ -1,11 +1,11 @@
 // TODO config, ES
-const env = "development";
+const ENV = "production"; // TODO better
 
 const config = {
   baseUrl:
-    env === "production"
-      ? "https://fullstackopen-2agf.onrender.com/api/persons"
-      : "http://localhost:3001/api/persons",
+    ENV === "production"
+      ? process.env.PROD_BACKEND_URL
+      : process.env.DEV_BACKEND_URL,
   constants: {
     NAME_MIN_LENGTH: 3,
     NUMBER_MIN_LENGTH: 8,
