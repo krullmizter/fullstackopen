@@ -1,11 +1,10 @@
-// TODO config, ES
-const ENV = "production"; // TODO better
+const ENV = "production";
 
 const config = {
   baseUrl:
     ENV === "production"
-      ? process.env.PROD_BACKEND_URL
-      : process.env.DEV_BACKEND_URL,
+      ? import.meta.env.VITE_PROD_BACKEND_URL
+      : import.meta.env.VITE_DEV_BACKEND_URL,
   constants: {
     NAME_MIN_LENGTH: 3,
     NUMBER_MIN_LENGTH: 8,

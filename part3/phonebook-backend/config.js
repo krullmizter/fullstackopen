@@ -1,4 +1,4 @@
-const ENV = "production"; // TODO better
+const ENV = "production";
 
 const config = {
   baseUrl:
