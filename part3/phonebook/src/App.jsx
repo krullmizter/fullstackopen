@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react";
 import { Notification, Filter, PersonForm, Person } from "./components";
 import { personService } from "./services";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
+import config from "./config";
+
+const { constants, errorMessages } = config;
+
+const validateName = (name) => name.length >= constants.NAME_MIN_LENGTH;
+const validateNumber = (number) =>
+  constants.NUMBER_REGEX.test(number) &&
+  number.length >= constants.NUMBER_MIN_LENGTH;
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -33,99 +41,86 @@ const App = () => {
     setFilteredSuggestions(suggestions);
   };
 
+  const handleNotification = (type, message) => {
+    setNotification({ type, message });
+    setTimeout(() => {
+      setNotification({ type: "", message: "" });
+    }, constants.NOTIFICATION_TIMEOUT);
+  };
+
   const addPerson = (event) => {
     event.preventDefault();
     const { newName, newNumber } = formState;
 
-    if (newName.length < 3) {
-      handleNotification("error", "Name must be at least 3 characters long");
+    if (!validateName(newName)) {
+      handleNotification("error", errorMessages.nameLength);
       return;
     }
 
-    const numberReg = /^\d{2,3}-\d+$/;
-    if (!numberReg.test(newNumber) || newNumber.length < 8) {
-      handleNotification(
-        "error",
-        "Phone number must be in the format: XX-XXXXXXX or XXX-XXXXXXX and at least 8 characters long"
-      );
+    if (!validateNumber(newNumber)) {
+      handleNotification("error", errorMessages.numberLength);
       return;
     }
 
-    const personObject = {
-      name: newName,
-      number: newNumber,
-    };
-
+    const personObject = { name: newName, number: newNumber };
     const existingPerson = persons.find((person) => person.name === newName);
+
     if (existingPerson) {
-      if (
-        window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
-        )
-      ) {
-        personService
-          .update(existingPerson.id, personObject)
-          .then((returnedPerson) => {
-            setPersons(
-              persons.map((person) =>
-                person.id !== existingPerson.id ? person : returnedPerson
-              )
-            );
-            handleNotification("success", `Updated ${returnedPerson.name}`);
-          })
-          .catch(() => {
-            handleNotification(
-              "error",
-              `Error updating ${existingPerson.name}`
-            );
-          });
+      if (window.confirm(`${newName} ${errorMessages.invalidPhone}`)) {
+        updatePerson(existingPerson.id, personObject);
       }
     } else {
-      personService
-        .create(personObject)
-        .then((returnedPerson) => {
-          setPersons(persons.concat(returnedPerson));
-          handleNotification("success", `Added ${returnedPerson.name}`);
-        })
-        .catch(() => {
-          handleNotification(
-            "error",
-            `Error adding ${personObject.name}`
-          );
-        });
+      createPerson(personObject);
     }
 
     setFormState({ newName: "", newNumber: "" });
   };
 
-  const deletePerson = (id) => {
+  const updatePerson = (id, personObject) => {
+    personService
+      .update(id, personObject)
+      .then((returnedPerson) => {
+        setPersons(
+          persons.map((person) => (person.id !== id ? person : returnedPerson))
+        );
+        handleNotification("success", `Updated ${returnedPerson.name}`);
+      })
+      .catch(() => {
+        handleNotification("error", `Error updating ${personObject.name}`);
+      });
+  };
+
+  const createPerson = (personObject) => {
+    personService
+      .create(personObject)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        handleNotification("success", `Added ${returnedPerson.name}`);
+      })
+      .catch(() => {
+        handleNotification("error", `Error adding ${personObject.name}`);
+      });
+  };
+
+  const deletePerson = async (id) => {
     const person = persons.find((p) => p.id === id);
     if (!person) {
-      console.error("Person not found");
+      console.error(errorMessages.personNotFound);
+      handleNotification("error", errorMessages.personNotFound);
       return;
     }
 
-    if (window.confirm(`Delete ${person.name}?`)) {
-      personService
-        .remove(id)
-        .then(() => {
-          setPersons((prev) => prev.filter((p) => p.id !== id));
-          handleNotification("success", `${person.name} was deleted`);
-        })
-        .catch(() =>
-          handleNotification(
-            "error",
-            `Error deleting ${person.name}`
-          )
-        );
-    }
-  };
+    const confirmDeletion = window.confirm(`Delete ${person.name}?`);
+    if (!confirmDeletion) return;
 
-  const handleNotification = (type, message) => {
-    setNotification({ type, message });
-    setTimeout(() => {
-      setNotification({ type: "", message: "" });
-    }, 5000);
+    try {
+      await personService.remove(id);
+      setPersons((prev) => prev.filter((p) => p.id !== id));
+      handleNotification("success", `${person.name} was deleted`);
+    } catch (error) {
+      console.error(`Error deleting ${person.name}:`, error);
+      handleNotification("error", `Error deleting ${person.name}`);
+    }
   };
 
   return (
