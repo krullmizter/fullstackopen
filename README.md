@@ -1,5 +1,6 @@
 # Full Stack Open | Course Project
-###  Open University Course by the University of Helsinki
+
+### Open University Course by the University of Helsinki
 
 Course content [https://fullstackopen.com/en/](https://fullstackopen.com/en/)
 
@@ -10,19 +11,24 @@ Course content [https://fullstackopen.com/en/](https://fullstackopen.com/en/)
 ## Built mainly using: Vite + React
 
 Technologies covered:
+
 - React
 - Redux
 - Node.js
 - MongoDB
 - GraphQL
-- TypeScript 
+- TypeScript
+
+Testing rest API calls with: REST Client, in VS Code.
 
 ---
 
-## Hosting
+## Part3 - Hosting
 
 ### Backend
+
 The back end is deployed at [https://fullstackopen-2agf.onrender.com](https://fullstackopen-2agf.onrender.com)
 
 ### Frontend
+
 The front end is deployed at [https://fullstackopen-part3-phonebook-jqxr.onrender.com](https://fullstackopen-part3-phonebook-jqxr.onrender.com)
