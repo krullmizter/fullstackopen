@@ -138,6 +138,44 @@ test("400 status if blog URL is missing from the response", async () => {
   await api.post("/api/blogs").send(newBlog).expect(400);
 });
 
+// 4.13
+test("Delete a blog by ID", async () => {
+  const newBlog = await new Blog({
+    title: "Bad blog",
+    author: "John Smith",
+    url: "https://google.com",
+    likes: 3,
+  }).save();
+
+  let blogs = await Blog.find({});
+  assert.strictEqual(blogs.length, 1);
+
+  await api.delete(`/api/blogs/${newBlog.id}`).expect(204);
+
+  blogs = await Blog.find({});
+  assert.strictEqual(blogs.length, 0);
+});
+
+// 4.14
+test("Update likes of a blog based on its ID", async () => {
+  const newBlog = await new Blog({
+    title: "Malformed blog",
+    author: "Jane Smith",
+    url: "https://google.com",
+    likes: 55,
+  }).save();
+
+  const updateLikes = { likes: 33 };
+
+  const response = await api
+    .put(`/api/blogs/${newBlog.id}`)
+    .send(updateLikes)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  assert.strictEqual(response.body.likes, updateLikes.likes);
+});
+
 // CLose the DB connection after all tests
 after(async () => {
   await mongoose.connection.close();

@@ -31,7 +31,45 @@ const createBlog = async (req, res, next) => {
   }
 };
 
+// Delete a blog, by its ID
+const deleteBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.findByIdAndDelete(req.params.id);
+
+    if (!blog) {
+      return res.status(404).send({ error: "The blog was not found" });
+    }
+
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Update a blog, by its ID
+const updateBlog = async (req, res, next) => {
+  const { likes } = req.body;
+
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      { likes },
+      { new: true, runValidators: true, context: "query" }
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).send({ error: "The blog was not found" });
+    }
+
+    res.json(updatedBlog);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllBlogs,
   createBlog,
+  deleteBlog,
+  updateBlog,
 };
