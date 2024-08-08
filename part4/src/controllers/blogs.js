@@ -1,32 +1,37 @@
 // This file handles the blogs "business" logic
 const Blog = require("../models/blog");
 
-const getBlogs = async (req, res) => {
+// Get all blogs
+const getAllBlogs = async (req, res, next) => {
   try {
     const blogs = await Blog.find({});
+
+    if (blogs.length === 0) {
+      console.error("No blogs were found");
+      return res.status(404).send({ error: "No blogs were found" });
+    }
+
     res.json(blogs);
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error" });
+    next(error);
   }
 };
 
-const createBlog = async (req, res) => {
-  const { title, author, url, likes } = req.body;
-
-  if (!title || !url) {
-    return res.status(400).json({ error: "Title and URL are required" });
-  }
-
+// Create a blog
+const createBlog = async (req, res, next) => {
   try {
-    const newBlog = new Blog({ title, author, url, likes });
+    const { title, author, url, likes } = req.body;
+
+    const newBlog = new Blog({ title, author, url, likes: likes || 0 });
     const savedBlog = await newBlog.save();
+
     res.status(201).json(savedBlog);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 };
 
 module.exports = {
-  getBlogs,
+  getAllBlogs,
   createBlog,
 };
