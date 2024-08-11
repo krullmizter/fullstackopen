@@ -24,7 +24,9 @@ const loginUser = async (req, res, next) => {
     expiresIn: "1h",
   });
 
-  res.status(200).send({ token, username: user.username, name: user.name });
+  res
+    .status(200)
+    .send({ token, username: user.username, name: user.name, id: user._id });
 };
 
 module.exports = { loginUser };

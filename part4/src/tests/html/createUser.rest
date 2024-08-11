@@ -1,8 +1,8 @@
 curl -X POST http://localhost:3001/api/users \
 -H "Content-Type: application/json" \
 -d '{
-  "username": "SamDaMan",
-  "name": "Spiderman",
+  "username": "Amanda",
+  "name": "Panda",
   "password": "123",
   "likes": 0
 }'
