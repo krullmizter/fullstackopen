@@ -1,0 +1,9 @@
+curl -X POST http://localhost:3001/api/blogs \
+-H "Content-Type: application/json" \
+-H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNhbURhTWFuIiwiaWQiOiI2NmI4ZmUyOWEzNjBlOWY4YjZkMzJhYzQiLCJpYXQiOjE3MjMzOTk3MzMsImV4cCI6MTcyMzQwMzMzM30.TANSoDR0Z3HaEOIY1y6F9GWiikdZdfzMLYJPAYdl4xk" \
+-d '{
+  "title": "A blog 1",
+  "author": "SamDaMan",
+  "url": "http://google.com",
+  "likes": 5
+}'

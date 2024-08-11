@@ -1,8 +1,5 @@
-// Main entry file (often index.js but I like server.js more)
-
-require("dotenv").config(); // Init dotenv to load environment variables
-
-const config = require("./src/utils/config"); // Handles configs, using .env file
+require("dotenv").config();
+const config = require("./src/utils/config");
 const mongoose = require("mongoose");
 const app = require("./app");
 
@@ -14,13 +11,15 @@ const server = app.listen(config.port, () => {
       : `http://localhost:${config.port}`;
 
   console.log(
-    `\nBackend env: ${config.env}\nBackend running on: ${backendUrl}`,
+    `\nBackend env: ${config.env}\nBackend running on: ${backendUrl}`
   );
 });
 
 // DB connection
 mongoose
-  .connect(config.mongoUrl, {})
+  .connect(config.mongoUrl, {
+    serverSelectionTimeoutMS: 30000,
+  })
   .then(() => {
     console.log("Successfully connected to DB\n");
   })
@@ -29,30 +28,47 @@ mongoose
     process.exit(1);
   });
 
-// Graceful shutdowns
-const shutdown = () => {
-  console.log("Shutdown received: closing HTTP server");
-  server.close(() => {
-    console.log("HTTP server was shutdown");
-    mongoose.connection.close(false, () => {
-      console.log("DB connection was closed");
-      process.exit(0);
-    });
-  });
+mongoose.set("bufferCommands", false);
+mongoose.set("bufferTimeoutMS", 20000);
 
-  // If shutdown takes too long, force it
-  setTimeout(() => {
-    console.error("Graceful shutdown of services took too long, forcing exit");
+// Graceful shutdowns
+const shutdown = async () => {
+  console.log("Shutdown received: closing HTTP server");
+
+  const shutdownTimer = setTimeout(() => {
+    console.error("Graceful shutdown took too long, forcing exit");
     process.exit(1);
-  }, 10000).unref();
+  }, 10000);
+
+  try {
+    await new Promise((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          console.error("Error shutting down the server:", err);
+          return reject(err);
+        }
+        console.log("HTTP server was shutdown");
+        resolve();
+      });
+    });
+
+    await mongoose.connection.close();
+    console.log("DB connection was closed");
+
+    clearTimeout(shutdownTimer);
+    process.exit(0);
+  } catch (error) {
+    console.error("Error during shutdown:", error);
+    process.exit(1);
+  }
 };
 
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
 // Track unhandled rejections
-process.on("unhandledRejection", (res, prom) => {
-  console.error("Unhandled rejection:", prom, "due to:", res);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection:", reason, "in promise:", promise);
   shutdown();
 });
 

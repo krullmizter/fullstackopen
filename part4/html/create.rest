@@ -1,8 +1,0 @@
-curl -X POST http://localhost:3001/api/blogs \
--H "Content-Type: application/json" \
--d '{
-  "title": "A blog",
-  "author": "Spiderman",
-  "url": "http://google.com",
-  "likes": 0
-}'

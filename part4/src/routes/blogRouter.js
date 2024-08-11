@@ -1,11 +1,10 @@
-// This handles all API endpoints and moving requests to controllers to handle
 const express = require("express");
 const {
   getAllBlogs,
   createBlog,
   deleteBlog,
   updateBlog,
-} = require("../controllers/blogs");
+} = require("../controllers/blogsController");
 
 const router = express.Router();
 

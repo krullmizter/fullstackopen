@@ -1,13 +1,16 @@
 // Core
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 // Custom
-const logger = require("./src/utils/logger");
-const blogRouter = require("./src/routes/blog");
 const middleware = require("./src/utils/middleware");
+const logger = require("./src/utils/logger");
+const blogRouter = require("./src/routes/blogRouter");
+const userRouter = require("./src/routes/userRouter");
+const loginRouter = require("./src/routes/loginRouter");
 
 const app = express();
 
@@ -22,12 +25,17 @@ app.use(
     message: {
       error: "Too many requests (Please don't DDoS), try again later.",
     },
-  }),
+  })
 );
 logger(app); // Apply morgan logger middleware
 
+// Apply middleware before routes
+app.use(middleware.tokenExtractor);
+app.use("/api/blogs", middleware.userExtractor, blogRouter); // Ensure userExtractor is only for routes that need it
+
 // Routes
-app.use("/api/blogs", blogRouter);
+app.use("/api/users", userRouter);
+app.use("/api/login", loginRouter);
 
 // Additional middleware
 app.use(middleware.unknownEndpoint);
