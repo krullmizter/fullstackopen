@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { updateBlog, deleteBlog } from "../services/blogService";
 import { getToken, getUser } from "../utils/localStorage";
+import PropTypes from "prop-types";
 
 const Blog = ({ blog, onBlogUpdated }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -99,6 +100,21 @@ const Blog = ({ blog, onBlogUpdated }) => {
       )}
     </div>
   );
+};
+
+Blog.propTypes = {
+  blog: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    author: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
+    likes: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+  onBlogUpdated: PropTypes.func.isRequired,
 };
 
 export default Blog;

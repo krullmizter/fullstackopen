@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { createBlog } from "../services/blogService";
 import { getToken } from "../utils/localStorage";
+import PropTypes from "prop-types";
 
 const NewBlogForm = ({ setNotification, onBlogCreated }) => {
   const [title, setTitle] = useState("");
@@ -86,6 +87,11 @@ const NewBlogForm = ({ setNotification, onBlogCreated }) => {
       </button>
     </form>
   );
+};
+
+NewBlogForm.propTypes = {
+  setNotification: PropTypes.func.isRequired,
+  onBlogCreated: PropTypes.func.isRequired,
 };
 
 export default NewBlogForm;

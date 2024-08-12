@@ -3,6 +3,7 @@ import { getBlogs } from "../services/blogService";
 import { getUser } from "../utils/localStorage";
 import NewBlogForm from "./NewBlogForm";
 import Blog from "./Blog";
+import PropTypes from "prop-types";
 
 const BlogList = ({ setNotification }) => {
   const [blogs, setBlogs] = useState([]);
@@ -68,6 +69,10 @@ const BlogList = ({ setNotification }) => {
       </ul>
     </div>
   );
+};
+
+BlogList.propTypes = {
+  setNotification: PropTypes.func.isRequired,
 };
 
 export default BlogList;
