@@ -14,6 +14,7 @@ const Blog = ({ blog, onBlogUpdated }) => {
 
   const handleLike = useCallback(async () => {
     const token = getToken();
+    console.log("Handle like token:", token);
     if (!token) {
       console.error("User is not authenticated");
       return;
@@ -24,6 +25,7 @@ const Blog = ({ blog, onBlogUpdated }) => {
       const updatedBlog = { ...blog, likes: blog.likes + 1 };
       await updateBlog(blog.id, updatedBlog, token);
       onBlogUpdated();
+      console.log("Like button clicked");
     } catch (error) {
       console.error("Failed to like blog", error);
     } finally {
@@ -71,31 +73,40 @@ const Blog = ({ blog, onBlogUpdated }) => {
   );
 
   return (
-    <div style={blogStyle}>
-      <div>
-        {blog.title} by {blog.author}
-        <button onClick={handleToggleDetails}>
+    <div style={blogStyle} className="blog-component">
+      <div className="blog-summary">
+        <span className="blog-title">{blog.title}</span> by{" "}
+        <span className="blog-author">{blog.author}</span>
+        <button className="toggle-details" onClick={handleToggleDetails}>
           {showDetails ? "Hide" : "View"}
         </button>
-        <button onClick={handleLike} disabled={isLoading}>
+        <button
+          className="like-button"
+          onClick={handleLike}
+          disabled={isLoading}
+        >
           Like
         </button>
         {currentUser && blog.user.id === currentUser.id && (
-          <button onClick={handleDelete} disabled={isLoading}>
+          <button
+            className="delete-button"
+            onClick={handleDelete}
+            disabled={isLoading}
+          >
             Delete
           </button>
         )}
       </div>
       {showDetails && (
-        <div>
-          <div>
+        <div className="blog-details">
+          <div className="blog-url">
             URL:{" "}
             <a href={blog.url} target="_blank" rel="noopener noreferrer">
               {blog.url}
             </a>
           </div>
-          <div>Likes: {blog.likes}</div>
-          <div>Added by: {blog.user.name}</div>
+          <div className="blog-likes">Likes: {blog.likes}</div>
+          <div className="blog-added-by">Added by: {blog.user.name}</div>
         </div>
       )}
     </div>

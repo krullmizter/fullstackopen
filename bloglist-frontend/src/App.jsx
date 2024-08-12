@@ -78,7 +78,17 @@ function App() {
               />
               <Route
                 path="/new-blog"
-                element={<NewBlogForm setNotification={setNotification} />}
+                element={
+                  <NewBlogForm
+                    setNotification={setNotification}
+                    onBlogCreated={() => {
+                      setNotification({
+                        message: "Blog created successfully",
+                        type: "success",
+                      });
+                    }}
+                  />
+                }
               />
               <Route path="*" element={<Navigate to="/" />} />
             </>
