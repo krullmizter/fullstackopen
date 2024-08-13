@@ -8,13 +8,9 @@ const Filter = () => {
     dispatch(setFilter(event.target.value));
   };
 
-  const style = {
-    marginBottom: 10,
-  };
-
   return (
-    <div style={style}>
-      filter <input onChange={handleChange} />
+    <div className="filter">
+      <input onChange={handleChange} placeholder="Filter the anecdotes..." />
     </div>
   );
 };

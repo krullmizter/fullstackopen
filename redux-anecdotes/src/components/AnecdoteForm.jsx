@@ -1,26 +1,34 @@
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createAnecdote } from "../reducers/anecdoteReducer";
+import {
+  setNotification,
+  clearNotification,
+} from "../reducers/notificationReducer";
 
 const AnecdoteForm = () => {
-  const [content, setContent] = useState("");
   const dispatch = useDispatch();
 
-  const addAnecdote = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(createAnecdote(content));
-    setContent("");
+    const content = event.target.anecdote.value;
+    event.target.anecdote.value = "";
+    dispatch(
+      createAnecdote({
+        content,
+        id: (100000 * Math.random()).toFixed(0),
+        votes: 0,
+      })
+    );
+    dispatch(setNotification(`Created a new anecdote: "${content}"`));
+    setTimeout(() => dispatch(clearNotification()), 5000);
   };
 
   return (
-    <form onSubmit={addAnecdote}>
+    <form onSubmit={handleSubmit}>
       <div>
-        <input
-          value={content}
-          onChange={({ target }) => setContent(target.value)}
-        />
+        <input name="anecdote" placeholder="Enter a new anecdote..." />
       </div>
-      <button type="submit">Add Anecdote</button>
+      <button type="submit">Create anecdote</button>
     </form>
   );
 };

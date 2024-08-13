@@ -1,10 +1,7 @@
 import ReactDOM from "react-dom/client";
-import { createStore } from "redux";
 import { Provider } from "react-redux";
 import App from "./App";
-import mainReducer from "../src/reducers/index";
-
-const store = createStore(mainReducer);
+import store from "./store"; // Correct import path for the Redux store
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
