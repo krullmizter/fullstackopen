@@ -62,7 +62,9 @@ function App() {
           <nav>
             <Link to="/">Home</Link>
             <Link to="/new-blog">New Blog</Link>
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={handleLogout} className="logoutBtn">
+              Logout
+            </button>
           </nav>
         )}
         <Notification

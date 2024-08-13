@@ -87,7 +87,7 @@ const Blog = ({ blog, onBlogUpdated }) => {
         >
           Like
         </button>
-        {currentUser && blog.user.id === currentUser.id && (
+        {currentUser && blog.user && blog.user.id === currentUser.id && (
           <button
             className="delete-button"
             onClick={handleDelete}
@@ -106,7 +106,6 @@ const Blog = ({ blog, onBlogUpdated }) => {
             </a>
           </div>
           <div className="blog-likes">Likes: {blog.likes}</div>
-          <div className="blog-added-by">Added by: {blog.user.name}</div>
         </div>
       )}
     </div>

@@ -133,9 +133,22 @@ const updateBlog = async (req, res, next) => {
   }
 };
 
+const deleteAllBlogs = async (req, res, next) => {
+  try {
+    console.log("Deleting all blogs...");
+    await Blog.deleteMany({});
+    console.log("All blogs deleted");
+    res.status(204).end();
+  } catch (error) {
+    console.error("Error deleting blogs:", error);
+    next(error);
+  }
+};
+
 module.exports = {
   getAllBlogs,
   createBlog,
   deleteBlog,
   updateBlog,
+  deleteAllBlogs,
 };

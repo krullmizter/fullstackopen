@@ -70,9 +70,12 @@ const addUser = async (req, res, next) => {
 
 const deleteAllUsers = async (req, res, next) => {
   try {
+    console.log("Deleting all users...");
     await User.deleteMany({});
+    console.log("All users deleted");
     res.status(204).end();
   } catch (error) {
+    console.error("Error deleting users:", error);
     next(error);
   }
 };

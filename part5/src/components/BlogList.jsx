@@ -20,6 +20,13 @@ const BlogList = ({ setNotification }) => {
   const fetchBlogs = useCallback(async () => {
     try {
       const blogs = await getBlogs();
+
+      if (!blogs || blogs.length === 0) {
+        setNotification({ message: "No blogs available", type: "info" });
+        setBlogs([]);
+        return;
+      }
+
       setBlogs(blogs);
     } catch (error) {
       setNotification({ message: "Failed to fetch blogs", type: "error" });
@@ -60,13 +67,17 @@ const BlogList = ({ setNotification }) => {
           onBlogCreated={handleBlogChange}
         />
       )}
-      <ul>
-        {sortedBlogs.map((blog) => (
-          <li key={blog.id}>
-            <Blog blog={blog} onBlogUpdated={handleBlogChange} user={user} />
-          </li>
-        ))}
-      </ul>
+      {sortedBlogs.length === 0 ? (
+        <p>No blogs available.</p>
+      ) : (
+        <ul>
+          {sortedBlogs.map((blog) => (
+            <li key={blog.id}>
+              <Blog blog={blog} onBlogUpdated={handleBlogChange} user={user} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

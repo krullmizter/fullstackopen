@@ -5,8 +5,16 @@ const baseUrl = "/api/blogs";
 export const getBlogs = async () => {
   try {
     const response = await axios.get(baseUrl);
+
+    if (response.data.length === 0) {
+      return null;
+    }
+
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 404) {
+      return [];
+    }
     console.error("Error fetching blogs:", error);
     throw error;
   }

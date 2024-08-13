@@ -3,13 +3,11 @@ import PropTypes from "prop-types";
 
 const Notification = ({ notification, clearNotification }) => {
   useEffect(() => {
-    if (notification && notification.autoDismiss) {
-      const timer = setTimeout(() => {
-        clearNotification();
-      }, 5000);
+    const timer = setTimeout(() => {
+      clearNotification();
+    }, 3000);
 
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, [notification, clearNotification]);
 
   if (!notification) return null;
@@ -36,7 +34,6 @@ Notification.propTypes = {
   notification: PropTypes.shape({
     message: PropTypes.string,
     type: PropTypes.oneOf(["success", "error", "info"]),
-    autoDismiss: PropTypes.bool,
   }),
   clearNotification: PropTypes.func.isRequired,
 };

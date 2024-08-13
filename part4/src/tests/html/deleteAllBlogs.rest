@@ -1,2 +1,2 @@
-curl -X DELETE http://localhost:3001/api/blogs/66b903f17d07be53b86d21de
+curl -X POST http://localhost:3001/api/blogs/reset
 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFtYW5kYSIsImlkIjoiNjZiYjI3NWViMjI4YmUzNWFiNDg5MjY0IiwiaWF0IjoxNzIzNTQxMzQ4LCJleHAiOjE3MjM1NDQ5NDh9.e3C-VtAD6YqioZB_4MYfhjlzxnnJxN9bGP4Zo37_njI"
