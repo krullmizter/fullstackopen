@@ -68,7 +68,17 @@ const addUser = async (req, res, next) => {
   }
 };
 
+const deleteAllUsers = async (req, res, next) => {
+  try {
+    await User.deleteMany({});
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   addUser,
   getAllUsers,
+  deleteAllUsers,
 };
