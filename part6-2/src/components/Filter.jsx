@@ -10,7 +10,10 @@ const Filter = () => {
 
   return (
     <div className="filter">
-      <input onChange={handleChange} placeholder="Filter the anecdotes..." />
+      <input
+        onChange={handleChange}
+        placeholder="Filter through the anecdotes..."
+      />
     </div>
   );
 };

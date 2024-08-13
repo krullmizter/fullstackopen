@@ -1,23 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
+import axios from "axios";
 
-const initialState = [
-  "If it hurts, do it more often",
-  "Adding manpower to a late software project makes it later!",
-  "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
-  "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
-  "Premature optimization is the root of all evil.",
-  "Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.",
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-].map((content) => ({
-  content,
-  id: (100000 * Math.random()).toFixed(0),
-  votes: 0,
-}));
+const initialState = [];
 
 const anecdotesSlice = createSlice({
   name: "anecdotes",
   initialState,
   reducers: {
+    setAnecdotes(state, action) {
+      return action.payload;
+    },
     voteAnecdote(state, action) {
       const id = action.payload;
       return state
@@ -34,5 +26,13 @@ const anecdotesSlice = createSlice({
   },
 });
 
-export const { voteAnecdote, createAnecdote } = anecdotesSlice.actions;
+export const { setAnecdotes, voteAnecdote, createAnecdote } =
+  anecdotesSlice.actions;
 export default anecdotesSlice.reducer;
+
+export const initializeAnecdotes = () => {
+  return async (dispatch) => {
+    const response = await axios.get("http://localhost:3001/anecdotes");
+    dispatch(setAnecdotes(response.data));
+  };
+};

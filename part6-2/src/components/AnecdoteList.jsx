@@ -25,7 +25,7 @@ const AnecdoteList = () => {
     <div>
       {filteredAnecdotes.map((anecdote) => (
         <div className="anecdote" key={anecdote.id}>
-          <h3>Title {anecdote.content}</h3>
+          <h3>{anecdote.content}</h3>
           <div className="anecdote-wrap">
             Votes: {anecdote.votes}
             <button onClick={() => vote(anecdote.id)}>Upvote!</button>
