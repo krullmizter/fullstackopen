@@ -14,7 +14,7 @@
 }
 
 body {
-  font-family: "Arial", sans-serif;
+  font-family: 'Arial', sans-serif;
   line-height: 1.6;
   margin: 0;
   padding: 0;
@@ -37,6 +37,7 @@ header {
   border-radius: 8px;
   text-align: center;
   padding: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 header h1 {
@@ -46,20 +47,22 @@ header h1 {
 
 nav {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  margin-top: 15px;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-nav * {
-  color: var(--text-light);
+nav a {
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-  border-radius: 4px;
-  transition: background 0.3s ease;
+  color: var(--text-light);
+  padding: 10px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
 }
 
-nav a:hover {
+nav a.active {
   background: var(--border-light);
 }
 
@@ -140,7 +143,7 @@ nav a:hover {
   margin-top: 1rem;
 }
 
-.blog-url {
+.blog-url a {
   color: var(--info);
 }
 
@@ -155,6 +158,9 @@ nav a:hover {
 }
 
 .blog-likes {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
   margin-top: 0.5rem;
 }
 
@@ -199,7 +205,10 @@ button.like-button {
   }
 }
 
-.new-blog-form {
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   background: var(--background-light);
   border: 1px solid var(--border-dark);
   border-radius: 8px;
@@ -209,23 +218,23 @@ button.like-button {
   margin-bottom: 2rem;
 }
 
-.new-blog-form * {
+form * {
   box-sizing: border-box;
 }
-.new-blog-form h2 {
+form h2 {
   margin-top: 0;
   font-size: 1.8rem;
   color: var(--text-light);
 }
 
-.new-blog-form label {
+form label {
   display: block;
   margin: 0.5rem 0 0.2rem;
   color: var(--text-light);
 }
 
-.new-blog-form input,
-.new-blog-form textarea {
+form input,
+form textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--border-dark);
@@ -236,18 +245,18 @@ button.like-button {
   transition: border-color 0.3s ease;
 }
 
-.new-blog-form input:focus,
-.new-blog-form textarea:focus {
+form input:focus,
+form textarea:focus {
   border-color: var(--info);
   outline: none;
 }
 
-.new-blog-form input::placeholder,
-.new-blog-form textarea::placeholder {
+form input::placeholder,
+form textarea::placeholder {
   color: #888;
 }
 
-.new-blog-form button {
+form button {
   background: var(--info);
   color: #fff;
   border: none;
@@ -258,7 +267,7 @@ button.like-button {
   transition: background 0.3s ease;
 }
 
-.new-blog-form button:hover {
+form button:hover {
   background: var(--info-dark);
 }
 

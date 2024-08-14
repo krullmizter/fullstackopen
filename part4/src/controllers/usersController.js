@@ -22,6 +22,25 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+const getUserById = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId).populate("blogs", {
+      title: 1,
+      author: 1,
+      url: 1,
+    });
+
+    if (!user) {
+      return res.status(404).send({ error: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Add a new user
 const addUser = async (req, res, next) => {
   try {
@@ -84,4 +103,5 @@ module.exports = {
   addUser,
   getAllUsers,
   deleteAllUsers,
+  getUserById,
 };

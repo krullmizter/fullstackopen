@@ -1,59 +1,49 @@
-import axios from "axios";
+import axios from 'axios'
 
-const baseUrl = "/api/blogs";
+const baseUrl = '/api/blogs'
+
+const handleRequest = async (request) => {
+  try {
+    const response = await request()
+    return response.data
+  } catch (error) {
+    console.error('Request failed:', error)
+    throw error 
+  }
+}
 
 export const getBlogs = async () => {
   try {
-    const response = await axios.get(baseUrl);
-
-    if (response.data.length === 0) {
-      return null;
-    }
-
-    return response.data;
+    const response = await axios.get(baseUrl)
+    return response.data
   } catch (error) {
-    if (error.response && error.response.status === 404) {
-      return [];
-    }
-    console.error("Error fetching blogs:", error);
-    throw error;
+    console.error('Failed to fetch blogs', error)
+    return []
   }
-};
+}
 
-export const createBlog = async (blog, token) => {
-  try {
-    const config = {
+export const createBlog = (blog, token) =>
+  handleRequest(() =>
+    axios.post(baseUrl, blog, {
       headers: { Authorization: `Bearer ${token}` },
-    };
-    const response = await axios.post(baseUrl, blog, config);
-    return response.data;
-  } catch (error) {
-    console.error("Error creating blog:", error);
-    throw error;
-  }
-};
+    })
+  )
 
 export const updateBlog = async (id, updatedBlog, token) => {
   try {
-    const config = {
+    const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, {
       headers: { Authorization: `Bearer ${token}` },
-    };
-    const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, config);
-    return response.data;
+    })
+    return response.data
   } catch (error) {
-    console.error("Error updating blog:", error);
-    throw error;
+    console.error('Failed to update blog:', error)
+    throw error
   }
-};
+}
 
-export const deleteBlog = async (id, token) => {
-  try {
-    const config = {
+export const deleteBlog = (id, token) =>
+  handleRequest(() =>
+    axios.delete(`${baseUrl}/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
-    };
-    await axios.delete(`${baseUrl}/${id}`, config);
-  } catch (error) {
-    console.error("Error deleting blog:", error);
-    throw error;
-  }
-};
+    })
+  )

@@ -21,6 +21,23 @@ const getAllBlogs = async (req, res, next) => {
   }
 };
 
+const getBlog = async (req, res, next) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate("user", {
+      username: 1,
+      name: 1,
+    });
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    res.json(blog);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Create a blog
 const createBlog = async (req, res, next) => {
   try {
@@ -121,11 +138,49 @@ const updateBlog = async (req, res, next) => {
       req.params.id,
       { likes },
       { new: true, runValidators: true, context: "query" }
-    );
+    ).populate("user", {
+      username: 1,
+      name: 1,
+    });
 
     if (!updatedBlog) {
       return res.status(404).send({ error: "The blog was not found" });
     }
+
+    res.json(updatedBlog);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const addComment = async (req, res, next) => {
+  try {
+    const token = req.token;
+
+    if (!token) {
+      return res.status(401).json({ error: "Token missing" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!decodedToken.id) {
+      return res.status(401).json({ error: "Token invalid" });
+    }
+
+    const { comment } = req.body;
+
+    if (!comment) {
+      return res.status(400).json({ error: "Comment text is required" });
+    }
+
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ error: "Blog not found" });
+    }
+
+    blog.comments = blog.comments.concat(comment);
+    const updatedBlog = await blog.save();
 
     res.json(updatedBlog);
   } catch (error) {
@@ -147,8 +202,10 @@ const deleteAllBlogs = async (req, res, next) => {
 
 module.exports = {
   getAllBlogs,
+  getBlog,
   createBlog,
   deleteBlog,
   updateBlog,
   deleteAllBlogs,
+  addComment,
 };

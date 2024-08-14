@@ -1,47 +1,48 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
+// src/components/LoginForm.jsx
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
-const LoginForm = ({ handleLogin, setNotification }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+const LoginForm = ({ handleLogin }) => {
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: '',
+  })
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await handleLogin({ username, password });
-    } catch (error) {
-      setNotification({ message: "Invalid credentials", type: "error" });
-    }
-  };
+  const handleChange = (event) => {
+    const { name, value } = event.target
+    setCredentials({ ...credentials, [name]: value })
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    handleLogin(credentials)
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="new-blog-form">
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username}
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        name="username"
+        value={credentials.username}
+        onChange={handleChange}
+        placeholder="Username *"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        value={credentials.password}
+        onChange={handleChange}
+        placeholder="Password *"
+        required
+      />
       <button type="submit">Login</button>
     </form>
-  );
-};
+  )
+}
 
 LoginForm.propTypes = {
   handleLogin: PropTypes.func.isRequired,
-  setNotification: PropTypes.func.isRequired,
-};
+}
 
-export default LoginForm;
+export default LoginForm

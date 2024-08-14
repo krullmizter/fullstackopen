@@ -1,41 +1,31 @@
-import React, { useEffect } from "react";
-import PropTypes from "prop-types";
+// src/components/Notification.jsx
+import React from 'react'
+import PropTypes from 'prop-types'
 
 const Notification = ({ notification, clearNotification }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      clearNotification();
-    }, 3000);
+  if (!notification) return null
 
-    return () => clearTimeout(timer);
-  }, [notification, clearNotification]);
-
-  if (!notification) return null;
+  const { message, type } = notification
 
   return (
-    <div
-      className={`notification ${notification.type}`}
-      aria-live="assertive"
-      aria-atomic="true"
-    >
-      <p>{notification.message}</p>
-      <button
-        onClick={clearNotification}
-        aria-label="Close notification"
+    <div className={`notification ${type}`}>
+      <p>{message}</p>
+      <div
         className="notification-close-button"
+        onClick={clearNotification}
       >
         &times;
-      </button>
+      </div>
     </div>
-  );
-};
+  )
+}
 
 Notification.propTypes = {
   notification: PropTypes.shape({
-    message: PropTypes.string,
-    type: PropTypes.oneOf(["success", "error", "info"]),
+    message: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['success', 'error', 'info']).isRequired,
   }),
   clearNotification: PropTypes.func.isRequired,
-};
+}
 
-export default Notification;
+export default Notification
