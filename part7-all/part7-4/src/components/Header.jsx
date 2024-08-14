@@ -1,4 +1,3 @@
-// src/components/Header/Header.jsx
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -28,6 +27,12 @@ const Header = ({ isLoggedIn, onLogout }) => {
             className={pathname === '/new-blog' ? 'active' : ''}
           >
             Add Blog
+          </Link>
+          <Link
+            to="/users"
+            className={pathname === '/users' ? 'active' : ''}
+          >
+            Users
           </Link>
           <button onClick={handleLogout} className="logoutBtn">
             Logout

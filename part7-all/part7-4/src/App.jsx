@@ -1,6 +1,5 @@
-// src/App.jsx
 import React from 'react'
-import { Provider, useDispatch, useSelector } from 'react-redux'
+import { Provider } from 'react-redux'
 import {
   BrowserRouter as Router,
   Route,
@@ -15,23 +14,18 @@ import NewBlogForm from './components/Blog/NewBlogForm'
 import Notification from './components/Notification'
 import { useAuth } from './hooks/useAuth'
 import { useNotifications } from './hooks/useNotification'
-import {
-  setNotification,
-  clearNotification,
-} from './reducers/notificationReducer'
+import UserList from './components/User/UserList'
 
 const AppContent = () => {
-  const dispatch = useDispatch()
-  const notification = useSelector((state) => state.notification)
+  const { notification, clear } = useNotifications()
   const { user, login, logout } = useAuth()
-  useNotifications()
 
   return (
     <Router>
       <Header isLoggedIn={!!user} onLogout={logout} />
       <Notification
         notification={notification}
-        clearNotification={() => dispatch(clearNotification())}
+        clearNotification={clear}
       />
       <Routes>
         {user ? (
@@ -52,6 +46,7 @@ const AppContent = () => {
                 />
               }
             />
+            <Route path="/users" element={<UserList />} />{' '}
             <Route path="*" element={<Navigate to="/" />} />
           </>
         ) : (
