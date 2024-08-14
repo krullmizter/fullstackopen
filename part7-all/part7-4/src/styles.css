@@ -1,0 +1,310 @@
+:root {
+  --background-dark: #121212;
+  --background-light: #1e1e1e;
+  --text-light: #e0e0e0;
+  --text-dark: #333;
+  --border-light: #333;
+  --border-dark: #444;
+  --info: #4a90e2;
+  --info-dark: #357abd;
+  --success: #28a745;
+  --success-dark: #198132;
+  --error: #dc3545;
+  --error-dark: #a51523;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  box-sizing: border-box;
+}
+
+#root {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 1rem;
+}
+
+header {
+  background: var(--background-light);
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+}
+
+nav * {
+  color: var(--text-light);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+nav a:hover {
+  background: var(--border-light);
+}
+
+.blog-list-container {
+  padding: 1rem;
+  background: var(--background-dark);
+  color: var(--text-light);
+}
+
+.welcome-message {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--text-light);
+}
+
+.create-blog-button {
+  background: var(--info);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.create-blog-button:hover {
+  background: var(--info-dark);
+}
+
+.no-blogs-message {
+  color: var(--text-light);
+  font-size: 1.2rem;
+}
+
+.blog-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.blog-list-item {
+  margin-bottom: 1rem;
+}
+
+.blog-list-item:last-child {
+  margin-bottom: 0;
+}
+
+.blog-item {
+  background: var(--background-light);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.blog-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.blog-title {
+  font-size: 1.6rem;
+  margin: 0;
+  color: var(--text-light);
+}
+
+.blog-author {
+  font-style: italic;
+  color: var(--text-light);
+}
+
+.blog-details {
+  margin-top: 1rem;
+}
+
+.blog-url {
+  color: var(--info);
+}
+
+.blog-url a {
+  color: var(--info);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.blog-url a:hover {
+  color: var(--info-dark);
+}
+
+.blog-likes {
+  margin-top: 0.5rem;
+}
+
+.blog-buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+
+  button {
+    flex: 1;
+  }
+}
+
+button {
+  background: var(--info);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: var(--info-dark);
+  }
+}
+
+button.delete-button {
+  background: var(--error);
+
+  &:hover {
+    background: var(--error-dark);
+  }
+}
+
+button.like-button {
+  background: var(--success);
+
+  &:hover {
+    background: var(--success-dark);
+  }
+}
+
+.new-blog-form {
+  background: var(--background-light);
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 2rem;
+}
+
+.new-blog-form * {
+  box-sizing: border-box;
+}
+.new-blog-form h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  color: var(--text-light);
+}
+
+.new-blog-form label {
+  display: block;
+  margin: 0.5rem 0 0.2rem;
+  color: var(--text-light);
+}
+
+.new-blog-form input,
+.new-blog-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-dark);
+  border-radius: 4px;
+  background: var(--background-dark);
+  color: var(--text-light);
+  margin-bottom: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.new-blog-form input:focus,
+.new-blog-form textarea:focus {
+  border-color: var(--info);
+  outline: none;
+}
+
+.new-blog-form input::placeholder,
+.new-blog-form textarea::placeholder {
+  color: #888;
+}
+
+.new-blog-form button {
+  background: var(--info);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.new-blog-form button:hover {
+  background: var(--info-dark);
+}
+
+.notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: var(--background-light);
+  color: var(--text-light);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.notification.success {
+  background-color: var(--success);
+}
+
+.notification.error {
+  background-color: var(--error);
+}
+
+.notification.info {
+  background-color: var(--info);
+}
+
+.notification-close-button {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.notification-close-button:hover {
+  color: #ddd;
+}
+
+.notification.fade-out {
+  opacity: 0;
+}
