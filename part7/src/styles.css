@@ -1,0 +1,42 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  padding: 5%;
+}
+
+header {
+  margin-bottom: 50px;
+}
+
+footer {
+  margin-top: 50px;
+}
+
+.add-anecdote-form {
+  form div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+}
+
+.notification {
+  font-size: 1.2em;
+  padding: 10px;
+  margin: 10px 0;
+
+  &.success {
+    color: green;
+    border-color: green;
+  }
+
+  &.error {
+    color: red;
+    border-color: red;
+  }
+}
