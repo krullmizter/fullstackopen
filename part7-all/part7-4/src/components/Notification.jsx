@@ -1,30 +1,39 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { clearNotification } from '../reducers/notificationReducer'
 
-const Notification = ({ notification, clearNotification }) => {
-  if (!notification) return null
+const Notification = () => {
+  const dispatch = useDispatch()
+  const notification = useSelector((state) => state.notification)
 
-  const { message, type } = notification
+  useEffect(() => {
+    if (notification.message) {
+      const timer = setTimeout(() => {
+        dispatch(clearNotification())
+      }, 3000)
+
+      return () => clearTimeout(timer)
+    }
+  }, [notification, dispatch])
+
+  if (!notification.message) return null
+
+  const handleClose = () => {
+    dispatch(clearNotification())
+  }
 
   return (
-    <div className={`notification ${type}`}>
-      <p>{message}</p>
-      <div
+    <div className={`notification ${notification.type}`} role="alert">
+      <p>{notification.message}</p>
+      <button
+        onClick={handleClose}
+        aria-label="Close notification"
         className="notification-close-button"
-        onClick={clearNotification}
       >
-        &times;
-      </div>
+        X
+      </button>
     </div>
   )
-}
-
-Notification.propTypes = {
-  notification: PropTypes.shape({
-    message: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(['success', 'error', 'info']).isRequired,
-  }),
-  clearNotification: PropTypes.func.isRequired,
 }
 
 export default Notification

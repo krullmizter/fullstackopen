@@ -1,41 +1,45 @@
-import React from 'react'
+import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser } from '../services/authService'
-import { setUser, clearUser } from '../reducers/userReducer'
+import { loginUser } from '../services/userService'
+import {
+  setUser as setUserInStore,
+  clearUser,
+} from '../reducers/userReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import {
   getToken,
   setToken,
-  removeToken,
+  removeUserAndToken,
   getUser,
-  setUser as setLocalUser,
+  setUser as setUserInLocalStorage,
 } from '../utils/localStorage'
 
 export const useAuth = () => {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
-  const token = getToken()
+  const token = useMemo(() => getToken(), [])
 
-  React.useEffect(() => {
+  useEffect(() => {
     const storedUser = getUser()
     if (storedUser) {
-      dispatch(setUser(storedUser))
+      dispatch(setUserInStore(storedUser))
     }
   }, [dispatch])
 
   const login = async (credentials) => {
     try {
-      const { id, username, name, token } = await loginUser(credentials)
+      const { token, user: userData } = await loginUser(credentials)
       setToken(token)
-      setLocalUser({ id, username, name })
-      dispatch(setUser({ id, username, name }))
+      setUserInLocalStorage(userData)
+      dispatch(setUserInStore(userData))
       dispatch(
         setNotification({ message: 'Login successful', type: 'success' })
       )
     } catch (error) {
+      console.error('Login error:', error)
       dispatch(
         setNotification({
-          message: 'Login failed: ' + error.message,
+          message: `Login failed: ${error.response?.data?.error || error.message}`,
           type: 'error',
         })
       )
@@ -43,8 +47,7 @@ export const useAuth = () => {
   }
 
   const logout = () => {
-    removeToken()
-    setLocalUser(null)
+    removeUserAndToken()
     dispatch(clearUser())
     dispatch(
       setNotification({

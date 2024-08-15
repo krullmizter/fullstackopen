@@ -17,6 +17,6 @@ router.post("/", createBlog);
 router.delete("/:id", deleteBlog);
 router.put("/:id", updateBlog);
 router.post("/reset", deleteAllBlogs);
-router.post("/:id/comments", addComment);
+router.post("/:id", addComment);
 
 module.exports = router;

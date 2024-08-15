@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { createBlog } from '../../services/blogService'
 import { addBlog } from '../../reducers/blogReducer'
 import { setNotification } from '../../reducers/notificationReducer'
@@ -11,39 +12,41 @@ const NewBlogForm = ({ onBlogCreated }) => {
   const [url, setUrl] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsLoading(true)
     try {
-      setIsLoading(true)
       const newBlog = await createBlog({ title, author, url }, getToken())
       dispatch(addBlog(newBlog))
-      onBlogCreated()
+      if (onBlogCreated) onBlogCreated()
       dispatch(
         setNotification({
-          message: `Blog ${newBlog.title} added!`,
+          message: `Blog "${newBlog.title}" added successfully!`,
           type: 'success',
         })
       )
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+      navigate('/')
     } catch (error) {
-      console.error('Failed to create blog', error)
+      console.error('Failed to create blog:', error)
       dispatch(
         setNotification({
-          message: 'Failed to create blog.',
+          message: 'Failed to create blog. Please try again.',
           type: 'error',
         })
       )
     } finally {
       setIsLoading(false)
+      setTitle('')
+      setAuthor('')
+      setUrl('')
     }
   }
 
   return (
     <div>
-      <h2>Add a blog</h2>
+      <h2>Add a New Blog</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"

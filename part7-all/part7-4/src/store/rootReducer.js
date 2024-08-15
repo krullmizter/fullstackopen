@@ -4,7 +4,7 @@ import userReducer from '../reducers/userReducer'
 import notificationReducer from '../reducers/notificationReducer'
 import userListReducer from '../reducers/userListReducer'
 
-const rootReducer = configureStore({
+const store = configureStore({
   reducer: {
     blogs: blogReducer,
     user: userReducer,
@@ -13,4 +13,4 @@ const rootReducer = configureStore({
   },
 })
 
-export default rootReducer
+export default store

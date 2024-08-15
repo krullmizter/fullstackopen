@@ -2,17 +2,20 @@ const jwt = require("jsonwebtoken");
 const Blog = require("../models/blogModel");
 const User = require("../models/usersModel");
 
-// Get all blogs
 const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await Blog.find({}).populate("user", {
+    const { userId } = req.query;
+
+    const filter = userId ? { user: userId } : {};
+
+    const blogs = await Blog.find(filter).populate("user", {
       username: 1,
       name: 1,
     });
 
     if (blogs.length === 0) {
-      console.error("No blogs were found");
-      return res.status(404).send({ error: "No blogs were found" });
+      console.error("Backend, no blogs found");
+      return res.status(404).send({ error: "No blogs found" });
     }
 
     res.json(blogs);
@@ -38,7 +41,6 @@ const getBlog = async (req, res, next) => {
   }
 };
 
-// Create a blog
 const createBlog = async (req, res, next) => {
   try {
     const token = req.token;
@@ -86,7 +88,6 @@ const createBlog = async (req, res, next) => {
   }
 };
 
-// Delete a blog, by its ID
 const deleteBlog = async (req, res, next) => {
   try {
     const token = req.token;
@@ -125,18 +126,33 @@ const deleteBlog = async (req, res, next) => {
   }
 };
 
-// Update a blog, by its ID
 const updateBlog = async (req, res, next) => {
   const { likes } = req.body;
+  const token = req.token;
 
   try {
-    if (likes !== undefined && typeof likes !== "number") {
-      return res.status(400).json({ error: "Likes must be a number" });
+    if (!token) {
+      return res.status(401).json({ error: "Token missing" });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+
+    if (!decodedToken.id) {
+      return res.status(401).json({ error: "Token invalid" });
+    }
+
+    const updateData = {};
+
+    if (likes !== undefined) {
+      if (typeof likes !== "number") {
+        return res.status(400).json({ error: "Likes must be a number" });
+      }
+      updateData.likes = likes;
     }
 
     const updatedBlog = await Blog.findByIdAndUpdate(
       req.params.id,
-      { likes },
+      updateData,
       { new: true, runValidators: true, context: "query" }
     ).populate("user", {
       username: 1,
@@ -154,9 +170,10 @@ const updateBlog = async (req, res, next) => {
 };
 
 const addComment = async (req, res, next) => {
-  try {
-    const token = req.token;
+  const { comment } = req.body;
+  const token = req.token; 
 
+  try {
     if (!token) {
       return res.status(401).json({ error: "Token missing" });
     }
@@ -167,14 +184,13 @@ const addComment = async (req, res, next) => {
       return res.status(401).json({ error: "Token invalid" });
     }
 
-    const { comment } = req.body;
-
-    if (!comment) {
-      return res.status(400).json({ error: "Comment text is required" });
+    if (!comment || typeof comment !== "string" || !comment.trim()) {
+      return res
+        .status(400)
+        .json({ error: "Comment must be a non-empty string" });
     }
 
     const blog = await Blog.findById(req.params.id);
-
     if (!blog) {
       return res.status(404).json({ error: "Blog not found" });
     }

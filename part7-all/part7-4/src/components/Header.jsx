@@ -1,16 +1,13 @@
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { useAuth } from '../hooks/useAuth'
 
 const Header = ({ isLoggedIn, onLogout }) => {
   const location = useLocation()
-  const { pathname } = location
-  const { logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    logout()
+    onLogout()
     navigate('/')
   }
 
@@ -19,22 +16,29 @@ const Header = ({ isLoggedIn, onLogout }) => {
       <h1>Blog List | Part 7</h1>
       {isLoggedIn && (
         <nav>
-          <Link to="/" className={pathname === '/' ? 'active' : ''}>
+          <Link
+            to="/"
+            className={location.pathname === '/' ? 'active' : ''}
+          >
             Blogs
           </Link>
           <Link
             to="/new-blog"
-            className={pathname === '/new-blog' ? 'active' : ''}
+            className={location.pathname === '/new-blog' ? 'active' : ''}
           >
             Add Blog
           </Link>
           <Link
             to="/users"
-            className={pathname === '/users' ? 'active' : ''}
+            className={location.pathname === '/users' ? 'active' : ''}
           >
             Users
           </Link>
-          <button onClick={handleLogout} className="logoutBtn">
+          <button
+            onClick={handleLogout}
+            className="logoutBtn"
+            aria-label="Logout"
+          >
             Logout
           </button>
         </nav>

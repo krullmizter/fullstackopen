@@ -1,66 +1,34 @@
 import React from 'react'
-import { Provider } from 'react-redux'
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from 'react-router-dom'
-import store from './store/rootReducer'
-import Header from './components/Header'
-import LoginForm from './components/LoginForm'
-import BlogList from './components/Blog/BlogList'
-import NewBlogForm from './components/Blog/NewBlogForm'
-import Notification from './components/Notification'
+import { useDispatch } from 'react-redux'
 import { useAuth } from './hooks/useAuth'
 import { useNotifications } from './hooks/useNotification'
-import UserList from './components/User/UserList'
+import Header from './components/Header'
+import Notification from './components/Notification'
+import AppRoutes from './AppRoutes'
 
-const AppContent = () => {
+const App = () => {
+  const dispatch = useDispatch()
   const { notification, clear } = useNotifications()
-  const { user, login, logout } = useAuth()
+  const { user, logout, login } = useAuth()
+
+  const handleLogin = async (credentials) => {
+    try {
+      await login(credentials)
+    } catch (error) {
+      console.error('Login failed:', error)
+    }
+  }
 
   return (
-    <Router>
+    <>
       <Header isLoggedIn={!!user} onLogout={logout} />
       <Notification
         notification={notification}
         clearNotification={clear}
       />
-      <Routes>
-        {user ? (
-          <>
-            <Route path="/" element={<BlogList />} />
-            <Route
-              path="/new-blog"
-              element={
-                <NewBlogForm
-                  onBlogCreated={() =>
-                    dispatch(
-                      setNotification({
-                        message: 'Blog created successfully',
-                        type: 'success',
-                      })
-                    )
-                  }
-                />
-              }
-            />
-            <Route path="/users" element={<UserList />} />{' '}
-            <Route path="*" element={<Navigate to="/" />} />
-          </>
-        ) : (
-          <Route path="/" element={<LoginForm handleLogin={login} />} />
-        )}
-      </Routes>
-    </Router>
+      <AppRoutes user={user} handleLogin={handleLogin} />
+    </>
   )
 }
-
-const App = () => (
-  <Provider store={store}>
-    <AppContent />
-  </Provider>
-)
 
 export default App

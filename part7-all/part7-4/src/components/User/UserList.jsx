@@ -1,54 +1,54 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUsers } from '../../services/userService'
 import { setUsers } from '../../reducers/userListReducer'
+import { Link } from 'react-router-dom'
 
 const UserList = () => {
   const dispatch = useDispatch()
   const users = useSelector((state) => state.userList)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true)
       try {
         const usersData = await getUsers()
         dispatch(setUsers(usersData))
       } catch (error) {
-        console.error('Failed to fetch data of users:', error)
+        console.error('Failed to fetch users:', error)
+        setError('Failed to load users. Please try again later.')
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchUsers()
   }, [dispatch])
 
-  if (!users) {
-    return <p>Loading users...</p>
-  }
+  if (loading) return <p>Loading users...</p>
 
   return (
     <div>
-      <h2>Users</h2>
-      <ul>
-        {users.length > 0 ? (
-          users.map((user) => (
-            <li key={user.id}>
-              <p>
-                <strong>Username:</strong> {user.username}
-              </p>
-              <p>
-                <strong>Name:</strong> {user.name}
-              </p>
-              <p>
-                <strong>ID:</strong> {user.id}
-              </p>
-              <p>
-                <strong>Blog Count:</strong> {user.blogs.length}
-              </p>
-            </li>
-          ))
-        ) : (
-          <p>No users available...</p>
-        )}
-      </ul>
+      <h2>All Users</h2>
+      {error && <p className="error-message">{error}</p>}
+      {users.length > 0 ? (
+        users.map((user) => (
+          <div key={user.id} className="user-item">
+            <p>
+              <Link to={`/users/${user.id}`}>{user.username}</Link>
+              <span>
+                {user.blogs.length === 0
+                  ? ' owns no blogs...'
+                  : ` owns ${user.blogs.length} blog${user.blogs.length > 1 ? 's' : ''}`}
+              </span>
+            </p>
+          </div>
+        ))
+      ) : (
+        <p>No users available...</p>
+      )}
     </div>
   )
 }

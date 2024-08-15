@@ -1,10 +1,8 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/usersModel");
 
-// Get all users
 const getAllUsers = async (req, res, next) => {
   try {
-    // Populate the blogs field with title, author, and url
     const users = await User.find({}).populate("blogs", {
       title: 1,
       author: 1,
@@ -41,7 +39,6 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// Add a new user
 const addUser = async (req, res, next) => {
   try {
     const { username, name, password } = req.body;

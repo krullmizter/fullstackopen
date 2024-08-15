@@ -1,42 +1,47 @@
-// src/components/LoginForm.jsx
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const LoginForm = ({ handleLogin }) => {
-  const [credentials, setCredentials] = useState({
-    username: '',
-    password: '',
-  })
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setCredentials({ ...credentials, [name]: value })
-  }
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError('')
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    handleLogin(credentials)
+    try {
+      await handleLogin({ username, password })
+    } catch (error) {
+      console.error('Login error:', error)
+      setError('Login failed. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <input
         type="text"
-        name="username"
-        value={credentials.username}
-        onChange={handleChange}
-        placeholder="Username *"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Username*"
         required
       />
       <input
         type="password"
-        name="password"
-        value={credentials.password}
-        onChange={handleChange}
-        placeholder="Password *"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Password*"
         required
       />
-      <button type="submit">Login</button>
+      {error && <div className="error">{error}</div>}
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Logging in...' : 'Login'}
+      </button>
     </form>
   )
 }
