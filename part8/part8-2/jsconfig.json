@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@auth/*": ["src/components/auth/*"],
+      "@authors/*": ["src/components/authors/*"],
+      "@books/*": ["src/components/books/*"],
+      "@graphql/*": ["backend/graphql/*"],
+      "@models/*": ["backend/models/*"]
+    }
+  }
+}

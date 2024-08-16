@@ -1,7 +1,16 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-})
+  resolve: {
+    alias: {
+      "@components": "/src/components",
+      "@auth": "/src/components/auth",
+      "@authors": "/src/components/authors",
+      "@books": "/src/components/books",
+      "@graphql": "/backend/graphql",
+      "@models": "/backend/graphql",
+    },
+  },
+});
