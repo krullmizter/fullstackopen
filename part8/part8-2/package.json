@@ -19,6 +19,7 @@
     "dotenv": "^16.4.5",
     "graphql": "^16.9.0",
     "graphql-subscriptions": "^2.0.0",
+    "graphql-ws": "^5.16.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "mongoose": "^8.5.3",
@@ -31,7 +32,8 @@
     "redux-logger": "^3.0.6",
     "redux-thunk": "^3.1.0",
     "reselect": "^5.1.1",
-    "styled-components": "^6.1.12"
+    "styled-components": "^6.1.12",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",

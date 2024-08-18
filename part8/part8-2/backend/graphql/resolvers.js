@@ -7,6 +7,8 @@ import { Book } from "../models/Book.js";
 import { User } from "../models/User.js";
 import dotenv from "dotenv";
 import process from "process";
+import { PubSub } from "graphql-subscriptions";
+const pubsub = new PubSub();
 
 dotenv.config();
 
@@ -83,15 +85,7 @@ export const resolvers = {
 
       return { user, token };
     },
-    addBook: async (
-      parent,
-      { title, author, yearPublished, genres },
-      context
-    ) => {
-      if (!context.currentUser) {
-        throw new AuthenticationError("Not authenticated");
-      }
-
+    addBook: async (parent, { title, author, yearPublished, genres }) => {
       const session = await mongoose.startSession();
       session.startTransaction();
       try {
@@ -114,6 +108,8 @@ export const resolvers = {
         await book.save({ session });
         await session.commitTransaction();
         await book.populate("author");
+
+        pubsub.publish("BOOK_ADDED", { bookAdded: book });
 
         return {
           ...book.toObject(),
@@ -138,6 +134,11 @@ export const resolvers = {
       author.born = setBornTo;
       await author.save();
       return author;
+    },
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator("BOOK_ADDED"),
     },
   },
 };

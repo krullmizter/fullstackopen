@@ -51,4 +51,8 @@ export const typeDefs = gql`
       genres: [String!]!
     ): Book!
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }
 `;
