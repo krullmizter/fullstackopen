@@ -11,67 +11,70 @@ dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_DEVELOPMENT;
 const JWT_SECRET = process.env.JWT_SECRET;
+const PORT = 4000;
 
 if (!MONGODB_URI || !JWT_SECRET) {
   console.error("Missing one or more environment variables");
   process.exit(1);
 }
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(MONGODB_URI, {});
-    console.log("Successfully connected to DB");
-  } catch (error) {
-    console.error("Error connecting to DB:", error.message);
+const connectDB = async (retries = 5) => {
+  while (retries) {
+    try {
+      await mongoose.connect(MONGODB_URI, {});
+      console.log("Successfully connected to DB");
+      break;
+    } catch (error) {
+      console.error(
+        `Error connecting to DB (Retries left: ${retries}):`,
+        error.message
+      );
+      retries -= 1;
+      await new Promise((res) => setTimeout(res, 3000));
+    }
+  }
+  if (!retries) {
+    console.error("Exhausted all retries. Exiting...");
     process.exit(1);
   }
 };
 
 const startApollo = async () => {
   await connectDB();
-  let tokenErrorLog = false;
 
   const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: async ({ req }) => {
       const auth = req.headers.authorization || "";
+      let currentUser = null;
 
       if (auth.toLowerCase().startsWith("bearer ")) {
         const token = auth.substring(7);
 
         try {
           const decodedToken = jwt.verify(token, JWT_SECRET);
-          const user = await User.findById(decodedToken.id);
-          if (!user) {
-            console.warn("JWT Token does not match any user in the DB");
-            return { currentUser: null };
-          }
-          return { currentUser: user };
+          currentUser = await User.findById(decodedToken.id);
         } catch (error) {
           if (error.name === "TokenExpiredError") {
-            if (!tokenErrorLog) {
-              tokenErrorLog = true;
-              console.warn("Error token expired:", error.message);
-            }
-            return { currentUser: null };
-          }
-          if (!tokenErrorLog) {
-            tokenErrorLog = true;
+            console.warn("Token expired:", error.message);
+          } else {
             console.error("Token verification failed:", error.message);
           }
-          return { currentUser: null };
         }
       }
-
-      return { currentUser: null };
+      return { currentUser };
+    },
+    cors: {
+      origin: "*",
+      credentials: true,
     },
   });
 
-  const serverInstance = server.listen({ port: 4000 });
-  serverInstance
+  server
+    .listen({ port: PORT, path: "/graphql" })
     .then(({ url }) => {
-      console.log(`Apollo server running at ${url}`);
+      console.log(`Server ready at ${url}graphql`);
     })
     .catch((error) => {
       console.error("Error starting the Apollo server:", error.message);
@@ -79,7 +82,7 @@ const startApollo = async () => {
     });
 
   const gracefulShutdown = async () => {
-    console.log("\nStarting graceful shutdown...");
+    console.log("Starting graceful shutdown...");
     try {
       if (server) {
         await server.stop();
@@ -90,7 +93,7 @@ const startApollo = async () => {
     } catch (error) {
       console.error("Error during graceful shutdown:", error.message);
     } finally {
-      process.exit(1);
+      process.exit(0);
     }
   };
 

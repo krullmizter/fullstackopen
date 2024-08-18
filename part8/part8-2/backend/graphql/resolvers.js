@@ -1,129 +1,143 @@
+import { AuthenticationError, UserInputError } from "apollo-server-express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import process from "process";
-import { UserInputError, AuthenticationError } from "apollo-server-errors";
+import mongoose from "mongoose";
 import { Author } from "../models/Author.js";
 import { Book } from "../models/Book.js";
 import { User } from "../models/User.js";
+import dotenv from "dotenv";
+import process from "process";
 
 dotenv.config();
-const SALT_ROUNDS = 10;
+
 const JWT_SECRET = process.env.JWT_SECRET;
 
-const generateToken = (user) => {
-  return jwt.sign({ username: user.username, id: user._id }, JWT_SECRET, {
-    expiresIn: "5h",
-  });
-};
+if (!JWT_SECRET) {
+  console.error("JWT_SECRET is not defined in environment variables");
+  process.exit(1);
+}
 
 export const resolvers = {
   Query: {
-    allBooks: async (root, args) => {
-      const query = {};
-
-      if (args.author) {
-        const author = await Author.findOne({ name: args.author });
-        if (author) query.author = author._id;
-      }
-
-      if (args.genre) {
-        query.genres = { $in: [args.genre] };
-      }
-
-      return Book.find(query).populate("author");
-    },
-    recommendedBooks: async (root, args, context) => {
-      if (!context.currentUser) {
-        throw new AuthenticationError("You must be logged in");
-      }
-
-      return Book.find({
-        genres: { $in: [context.currentUser.favoriteGenre] },
-      }).populate("author");
-    },
     allAuthors: async () => {
       return Author.find({});
     },
-    loggedInUser: (root, args, context) => {
-      if (!context.currentUser) {
-        throw new AuthenticationError("You must be logged in");
+    allBooks: async () => {
+      const books = await Book.find({}).populate("author");
+      return books.map((book) => ({
+        ...book.toObject(),
+        id: book._id.toString(),
+        author: {
+          ...book.author.toObject(),
+          id: book.author._id.toString(),
+        },
+      }));
+    },
+    recommendedBooks: async (parent, args, context) => {
+      const user = context.currentUser;
+      if (!user) {
+        throw new AuthenticationError("Not authenticated");
       }
-      return context.currentUser;
+
+      const books = await Book.find({ genres: user.favoriteGenre }).populate(
+        "author"
+      );
+
+      return books.map((book) => ({
+        ...book.toObject(),
+        id: book._id.toString(),
+        author: {
+          ...book.author.toObject(),
+          id: book.author._id.toString(),
+        },
+      }));
     },
   },
   Mutation: {
-    registerUser: async (root, args) => {
-      const passwordHash = await bcrypt.hash(args.password, SALT_ROUNDS);
-      const user = new User({ ...args, passwordHash });
-
-      try {
-        await user.save();
-        return user;
-      } catch (error) {
-        throw new UserInputError(error.message, { invalidArgs: args });
-      }
-    },
-    loginUser: async (root, args) => {
-      const user = await User.findOne({ username: args.username });
-
-      console.log(user);
-
-      if (!user || !(await bcrypt.compare(args.password, user.passwordHash))) {
-        throw new UserInputError("Invalid credentials");
+    loginUser: async (parent, { username, password }) => {
+      const user = await User.findOne({ username });
+      if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+        throw new AuthenticationError("Invalid credentials");
       }
 
-      return { value: generateToken(user), user: user };
+      const token = jwt.sign(
+        { id: user._id.toString(), username: user.username },
+        JWT_SECRET
+      );
+      return { user, token };
     },
-    addBook: async (root, args, context) => {
+    registerUser: async (parent, { username, password, favoriteGenre }) => {
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        throw new UserInputError("Username is already taken");
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+      const user = new User({ username, passwordHash, favoriteGenre });
+      await user.save();
+
+      const token = jwt.sign(
+        { id: user._id.toString(), username: user.username },
+        JWT_SECRET
+      );
+
+      return { user, token };
+    },
+    addBook: async (
+      parent,
+      { title, author, yearPublished, genres },
+      context
+    ) => {
       if (!context.currentUser) {
         throw new AuthenticationError("Not authenticated");
       }
 
-      let author = await Author.findOne({ name: args.author });
-
-      if (!author) {
-        author = new Author({ name: args.author });
-      }
-
-      author.bookCount = (author.bookCount || 0) + 1;
-
+      const session = await mongoose.startSession();
+      session.startTransaction();
       try {
-        await author.save();
-
-        const book = new Book({ ...args, author: author._id });
-        await book.save();
-
-        return book.populate("author");
-      } catch (error) {
-        if (error.name === "ValidationError") {
-          throw new UserInputError(error.message, { invalidArgs: args });
+        let authorObj = await Author.findOne({ name: author }).session(session);
+        if (!authorObj) {
+          authorObj = new Author({ name: author });
+          await authorObj.save({ session });
         }
-        throw new Error("An unexpected error occurred.");
+
+        authorObj.bookCount += 1;
+        await authorObj.save({ session });
+
+        const book = new Book({
+          title,
+          author: authorObj._id,
+          yearPublished,
+          genres,
+        });
+
+        await book.save({ session });
+        await session.commitTransaction();
+        await book.populate("author");
+
+        return {
+          ...book.toObject(),
+          id: book._id.toString(),
+          author: {
+            ...book.author.toObject(),
+            id: book.author._id.toString(),
+          },
+        };
+      } catch (error) {
+        await session.abortTransaction();
+        throw new Error("Failed to add book");
+      } finally {
+        session.endSession();
       }
     },
-    editAuthor: async (root, args, context) => {
-      if (!context.currentUser) {
-        throw new AuthenticationError("Not authenticated");
-      }
-
-      const author = await Author.findOne({ name: args.name });
-
+    editAuthor: async (parent, { name, setBornTo }) => {
+      const author = await Author.findOne({ name });
       if (!author) {
         throw new UserInputError("Author not found");
       }
-
-      author.born = args.setBornTo;
-
-      try {
-        await author.save();
-        return author;
-      } catch (error) {
-        if (error.name === "ValidationError") {
-          throw new UserInputError(error.message, { invalidArgs: args });
-        }
-        throw new Error("An unexpected error occurred.");
-      }
+      author.born = setBornTo;
+      await author.save();
+      return author;
     },
   },
 };

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
 
 const bookSchema = new mongoose.Schema({
   title: {
@@ -7,22 +6,23 @@ const bookSchema = new mongoose.Schema({
     required: true,
     minlength: 2,
   },
-  yearPublished: {
-    type: Number,
-    required: true,
-  },
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Author",
     required: true,
   },
+  yearPublished: {
+    type: Number,
+    required: true,
+    min: 1000,
+    max: new Date().getFullYear(),
+  },
   genres: [
     {
       type: String,
+      required: true,
     },
   ],
 });
-
-bookSchema.plugin(uniqueValidator);
 
 export const Book = mongoose.model("Book", bookSchema);

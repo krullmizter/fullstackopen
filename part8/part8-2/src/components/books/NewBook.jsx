@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { ADD_BOOK } from "@graphql/mutations";
-import { ALL_BOOKS } from "@graphql/queries";
+import { useDispatch, useSelector } from "react-redux";
+import { addBook } from "../../redux/slices/bookSlice";
 
 const NewBook = () => {
   const [title, setTitle] = useState("");
@@ -10,22 +9,8 @@ const NewBook = () => {
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
 
-  const [addBook] = useMutation(ADD_BOOK, {
-    update(cache, { data: { addBook } }) {
-      const { allBooks } = cache.readQuery({ query: ALL_BOOKS }) || {
-        allBooks: [],
-      };
-      cache.writeQuery({
-        query: ALL_BOOKS,
-        data: {
-          allBooks: [...allBooks, addBook],
-        },
-      });
-    },
-    onError: (err) => {
-      console.error(err.message);
-    },
-  });
+  const dispatch = useDispatch();
+  const { error, loading } = useSelector((state) => state.books);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -35,13 +20,20 @@ const NewBook = () => {
       return;
     }
 
-    addBook({
-      variables: {
+    dispatch(
+      addBook({
         title,
         author,
         yearPublished: parseInt(yearPublished, 10),
         genres: genres.length > 0 ? genres : [],
-      },
+      })
+    ).then((result) => {
+      if (!result.error) {
+        setTitle("");
+        setAuthor("");
+        setYearPublished("");
+        setGenres([]);
+      }
     });
   };
 
@@ -104,8 +96,11 @@ const NewBook = () => {
             ))}
           </ul>
         </div>
-        <button type="submit">Add Book</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Adding..." : "Add Book"}
+        </button>
       </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

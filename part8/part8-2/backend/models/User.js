@@ -7,10 +7,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     minlength: 3,
+    index: true,
   },
   favoriteGenre: {
     type: String,
     required: true,
+    enum: ["Science Fiction", "Fantasy", "Non-fiction", "Horror", "Romance"],
   },
   passwordHash: {
     type: String,

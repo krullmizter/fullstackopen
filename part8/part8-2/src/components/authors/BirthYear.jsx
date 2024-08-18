@@ -1,17 +1,32 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useMutation } from "@apollo/client";
 import { EDIT_AUTHOR } from "@graphql/mutations";
 import { ALL_AUTHORS } from "@graphql/queries";
+import { fetchAuthors } from "../../redux/slices/authorSlice";
 
 const BirthYear = () => {
   const [name, setName] = useState("");
   const [birthYear, setBirthYear] = useState("");
-  const authors = useSelector((state) => state.auth.authors || []);
+  const authors = useSelector((state) => state.authors.list || []);
+  const dispatch = useDispatch();
 
-  const [editAuthor] = useMutation(EDIT_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }],
+  const [editAuthor, { loading }] = useMutation(EDIT_AUTHOR, {
+    update(cache, { data: { editAuthor } }) {
+      const { allAuthors } = cache.readQuery({ query: ALL_AUTHORS });
+      cache.writeQuery({
+        query: ALL_AUTHORS,
+        data: {
+          allAuthors: allAuthors.map((author) =>
+            author.name === editAuthor.name
+              ? { ...author, born: editAuthor.born }
+              : author
+          ),
+        },
+      });
+    },
     onCompleted: () => {
+      dispatch(fetchAuthors());
       setName("");
       setBirthYear("");
       alert("Author updated successfully!");
@@ -24,11 +39,18 @@ const BirthYear = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !birthYear) {
-      alert("Please select an author and enter a birth year.");
+    const year = parseInt(birthYear, 10);
+    if (
+      !name ||
+      !birthYear ||
+      isNaN(year) ||
+      year < 1000 ||
+      year > new Date().getFullYear()
+    ) {
+      alert("Please select an author and enter a valid birth year.");
       return;
     }
-    editAuthor({ variables: { name, setBornTo: parseInt(birthYear, 10) } });
+    editAuthor({ variables: { name, setBornTo: year } });
   };
 
   return (
@@ -41,10 +63,11 @@ const BirthYear = () => {
             id="name"
             value={name}
             onChange={({ target }) => setName(target.value)}
+            disabled={loading}
           >
             <option value="">Select an author</option>
             {authors.map((author) => (
-              <option key={author.name} value={author.name}>
+              <option key={author.id} value={author.name}>
                 {author.name}
               </option>
             ))}
@@ -57,9 +80,12 @@ const BirthYear = () => {
             type="number"
             value={birthYear}
             onChange={({ target }) => setBirthYear(target.value)}
+            disabled={loading}
           />
         </div>
-        <button type="submit">Update Author</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Update Author"}
+        </button>
       </form>
     </div>
   );
