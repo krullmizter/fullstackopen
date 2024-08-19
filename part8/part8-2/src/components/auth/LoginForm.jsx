@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useMutation } from "@apollo/client";
-import { LOGIN_USER } from "@graphql/mutations";
-import { loginSuccess } from "../../redux/actions/authActions";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../../redux/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
@@ -10,23 +8,15 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const [login] = useMutation(LOGIN_USER, {
-    onCompleted: (data) => {
-      const { user, value } = data.loginUser;
-      localStorage.setItem("auth-token", value);
-      dispatch(loginSuccess(user, value));
-      navigate("/authors");
-    },
-    onError: (err) => {
-      console.error(err.message);
-      alert("Login failed. Please check your credentials.");
-    },
-  });
+  const error = useSelector((state) => state.auth.error);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login({ variables: { username, password } });
+    dispatch(login({ username, password })).then((response) => {
+      if (!response.error) {
+        navigate("/authors");
+      }
+    });
   };
 
   return (
@@ -54,6 +44,7 @@ const LoginForm = () => {
           />
         </div>
         <button type="submit">Login</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );

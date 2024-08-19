@@ -8,7 +8,7 @@ import RecommendedBooks from "./components/books/RecommendedBooks";
 import BirthYear from "./components/authors/BirthYear";
 import LoginForm from "./components/auth/LoginForm";
 import Register from "./components/auth/Register";
-import { logout, loginSuccess } from "./redux/actions/authActions";
+import { logout } from "./redux/slices/authSlice";
 import { jwtDecode } from "jwt-decode";
 
 const App = () => {
@@ -24,12 +24,17 @@ const App = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("auth-token");
+
     if (token) {
       try {
         const decodedUser = jwtDecode(token);
-        dispatch(loginSuccess(decodedUser, token));
+
+        dispatch({
+          type: "auth/login/fulfilled",
+          payload: { user: decodedUser, token: token },
+        });
       } catch (error) {
-        console.error("Invalid token");
+        console.error("Invalid token", error);
         localStorage.removeItem("auth-token");
         dispatch(logout());
       }

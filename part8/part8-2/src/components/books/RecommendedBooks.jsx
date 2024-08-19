@@ -1,13 +1,19 @@
-import { useQuery } from "@apollo/client";
-import { RECOMMENDED_BOOKS } from "@graphql/queries";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRecommendedBooks } from "../../redux/slices/bookSlice";
 
 const RecommendedBooks = () => {
-  const { data, loading, error } = useQuery(RECOMMENDED_BOOKS);
+  const dispatch = useDispatch();
+  const recommendedBooks = useSelector((state) => state.books.recommendedBooks);
+  const error = useSelector((state) => state.books.error);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  useEffect(() => {
+    dispatch(fetchRecommendedBooks());
+  }, [dispatch]);
 
-  if (!data.recommendedBooks || data.recommendedBooks.length === 0) {
+  if (error) return <p>Error: {error}</p>;
+
+  if (!recommendedBooks || recommendedBooks.length === 0) {
     return <p>No recommended books found.</p>;
   }
 
@@ -15,9 +21,12 @@ const RecommendedBooks = () => {
     <div className="container">
       <h2>Recommended Books</h2>
       <div className="cards">
-        {data.recommendedBooks.map((book) => (
+        {recommendedBooks.map((book) => (
           <div key={book.id} className="card">
             <h3>{book.title}</h3>
+            <p>
+              <strong>Genres:</strong> {book.genres.join(", ") || "N/A"}
+            </p>
             <p>By: {book.author.name}</p>
           </div>
         ))}

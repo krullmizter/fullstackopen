@@ -13,4 +13,7 @@ export default defineConfig({
       "@models": "/backend/graphql",
     },
   },
+  build: {
+    sourcemap: false,
+  },
 });

@@ -1,30 +1,17 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useMutation } from "@apollo/client";
-import { REGISTER_USER } from "@graphql/mutations";
-import { registerSuccess } from "../../redux/actions/authActions";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../../redux/slices/authSlice";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [favoriteGenre, setFavoriteGenre] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-
-  const [registerUser] = useMutation(REGISTER_USER, {
-    onCompleted: () => {
-      const user = { username, favoriteGenre };
-      dispatch(registerSuccess(user));
-      alert("User registered successfully!");
-    },
-    onError: (err) => {
-      console.error(err.message);
-      alert("An error occurred while registering.");
-    },
-  });
+  const error = useSelector((state) => state.auth.error);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    registerUser({ variables: { username, favoriteGenre, password } });
+    dispatch(register({ username, password, favoriteGenre }));
   };
 
   return (
@@ -62,6 +49,7 @@ const Register = () => {
           />
         </div>
         <button type="submit">Register</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );
