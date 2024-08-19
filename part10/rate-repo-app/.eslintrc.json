@@ -1,0 +1,41 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react-native/all"
+  ],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "react-hooks", "react-native"],
+  "rules": {
+    "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-native/no-inline-styles": "off",
+    "no-unused-vars": "warn",
+    "no-console": "warn",
+    "no-debugger": "error",
+    "no-trailing-spaces": "error",
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"],
+    "indent": ["error", 2],
+    "eol-last": ["error", "always"]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "name": "rate-repo-app",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "lint": "eslint ./src/**/*.{js,jsx} App.js --no-error-on-unmatched-pattern"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.11.4",
+    "@expo/metro-config": "^0.17.4",
+    "@expo/metro-runtime": "~3.2.3",
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "expo": "~51.0.28",
+    "expo-status-bar": "~1.12.1",
+    "formik": "^2.4.6",
+    "graphql": "^15.8.0",
+    "lodash": "^4.17.21",
+    "react": "18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "0.74.5",
+    "react-native-flash-message": "^0.4.2",
+    "react-native-web": "~0.19.10",
+    "react-router-native": "^6.26.1",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/eslint-parser": "^7.25.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-native": "^4.1.0"
+  },
+  "private": true
+}
