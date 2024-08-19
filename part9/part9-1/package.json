@@ -1,0 +1,28 @@
+{
+  "name": "part9-1",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "ts-node-dev --respawn src/index.ts",
+    "calc-bmi": "ts-node src/bmiCalc.ts",
+    "calc-exer": "ts-node src/exerciseCalc.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@types/express": "^4.17.21",
+    "eslint": "^9.9.0",
+    "globals": "^15.9.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.1.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
