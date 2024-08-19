@@ -17,12 +17,14 @@ app.use(
     error: unknown,
     _req: express.Request,
     res: express.Response,
-    _next: express.NextFunction
+    next: express.NextFunction
   ) => {
-    if (error instanceof Error) {
+    if (error instanceof SyntaxError) {
+      res.status(400).json({ error: "Malformed request data" });
+    } else if (error instanceof Error) {
       res.status(500).json({ error: error.message });
     } else {
-      res.status(500).json({ error: "An unknown error occurred." });
+      next();
     }
   }
 );
