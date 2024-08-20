@@ -48,16 +48,16 @@ const formatCount = (count) => {
 
 const RepoItem = ({ repository }) => {
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="repositoryItem">
       <View style={styles.infoContainer}>
         <Image
           source={{ uri: repository.ownerAvatarUrl }}
           style={styles.avatar}
         />
         <View style={styles.details}>
-          <CustomText>{repository.fullName}</CustomText>
-          <CustomText>{repository.description}</CustomText>
-          <CustomText style={styles.languageTag}>
+          <CustomText testID="fullName">{repository.fullName}</CustomText>
+          <CustomText testID="description">{repository.description}</CustomText>
+          <CustomText style={styles.languageTag} testID="language">
             {repository.language}
           </CustomText>
         </View>
@@ -65,19 +65,25 @@ const RepoItem = ({ repository }) => {
       <View style={styles.countsContainer}>
         <View style={styles.countItem}>
           <CustomText>Stars</CustomText>
-          <CustomText>{formatCount(repository.stargazersCount)}</CustomText>
+          <CustomText testID="stargazersCount">
+            {formatCount(repository.stargazersCount)}
+          </CustomText>
         </View>
         <View style={styles.countItem}>
           <CustomText>Forks</CustomText>
-          <CustomText>{formatCount(repository.forksCount)}</CustomText>
+          <CustomText testID="forksCount">
+            {formatCount(repository.forksCount)}
+          </CustomText>
         </View>
         <View style={styles.countItem}>
           <CustomText>Reviews</CustomText>
-          <CustomText>{repository.reviewCount}</CustomText>
+          <CustomText testID="reviewCount">{repository.reviewCount}</CustomText>
         </View>
         <View style={styles.countItem}>
           <CustomText>Rating</CustomText>
-          <CustomText>{repository.ratingAverage}</CustomText>
+          <CustomText testID="ratingAverage">
+            {repository.ratingAverage}
+          </CustomText>
         </View>
       </View>
     </View>
