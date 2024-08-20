@@ -8,6 +8,7 @@ import CustomText from "./CustomText";
 import theme from "./theme";
 import { useNavigate } from "react-router-native";
 import useSignIn from "../hooks/useSignIn";
+import { showMessage } from "react-native-flash-message";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
@@ -46,12 +47,20 @@ const SignUpForm = () => {
         });
 
         if (signInResult) {
+          showMessage({
+            message: "Registration Successful! You are now logged in.",
+            type: "success",
+          });
           navigate("/");
           resetForm();
         }
       }
     } catch (error) {
       console.error("Error during sign up:", error);
+      showMessage({
+        message: "Registration Failed. Please try again.",
+        type: "danger",
+      });
     }
   };
 
@@ -79,8 +88,10 @@ const SignUpForm = () => {
             onChangeText={handleChange("username")}
             onBlur={handleBlur("username")}
             value={values.username}
-            style={styles.input}
-            error={touched.username && errors.username}
+            style={[
+              styles.input,
+              touched.username && errors.username ? styles.inputError : null,
+            ]}
           />
           {touched.username && errors.username && (
             <CustomText style={styles.errorText}>{errors.username}</CustomText>
@@ -91,8 +102,10 @@ const SignUpForm = () => {
             onBlur={handleBlur("password")}
             value={values.password}
             secureTextEntry
-            style={styles.input}
-            error={touched.password && errors.password}
+            style={[
+              styles.input,
+              touched.password && errors.password ? styles.inputError : null,
+            ]}
           />
           {touched.password && errors.password && (
             <CustomText style={styles.errorText}>{errors.password}</CustomText>
@@ -103,8 +116,12 @@ const SignUpForm = () => {
             onBlur={handleBlur("passwordConfirm")}
             value={values.passwordConfirm}
             secureTextEntry
-            style={styles.input}
-            error={touched.passwordConfirm && errors.passwordConfirm}
+            style={[
+              styles.input,
+              touched.passwordConfirm && errors.passwordConfirm
+                ? styles.inputError
+                : null,
+            ]}
           />
           {touched.passwordConfirm && errors.passwordConfirm && (
             <CustomText style={styles.errorText}>
@@ -126,11 +143,15 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
   },
   input: {
-    borderWidth: 1,
+    height: 40,
     borderColor: theme.colors.textSecondary,
-    borderRadius: 5,
-    padding: theme.padding.small,
+    borderWidth: 1,
     marginBottom: theme.padding.small,
+    paddingHorizontal: theme.padding.small,
+    borderRadius: 5,
+  },
+  inputError: {
+    borderColor: theme.colors.error,
   },
   errorText: {
     color: theme.colors.error,

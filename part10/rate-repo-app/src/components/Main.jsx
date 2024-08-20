@@ -3,9 +3,9 @@ import { Route, Routes, Navigate } from "react-router-native";
 import { View, StyleSheet } from "react-native";
 import AppBar from "./AppBar";
 import RepoList from "./RepoList";
-import SignIn from "./SignIn";
 import SingleRepository from "./SingleRepository";
 import ReviewForm from "./ReviewForm";
+import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
 import ErrorBoundary from "./ErrorBoundary";
 import MyReviews from "./MyReviews";
@@ -24,7 +24,7 @@ const Main = () => {
         <AppBar />
         <Routes>
           <Route path="/" element={<RepoList />} />
-          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signin" element={<SignInForm />} />
           <Route path="/signup" element={<SignUpForm />} />
           <Route path="/repository/:id" element={<SingleRepository />} />
           <Route path="/create-review" element={<ReviewForm />} />

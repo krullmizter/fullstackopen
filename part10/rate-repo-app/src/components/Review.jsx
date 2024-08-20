@@ -2,10 +2,11 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import CustomText from "./CustomText";
 import { format } from "date-fns";
+import { cardStyles } from "./theme";
 
 const Review = ({ review }) => {
   return (
-    <View style={styles.reviewContainer}>
+    <View style={cardStyles.container}>
       <View style={styles.header}>
         <CustomText style={styles.username}>{review.user.username}</CustomText>
         <CustomText style={styles.date}>
@@ -21,13 +22,6 @@ const Review = ({ review }) => {
 };
 
 const styles = StyleSheet.create({
-  reviewContainer: {
-    padding: 15,
-    backgroundColor: "#fff",
-    marginBottom: 10,
-    borderRadius: 5,
-    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
-  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -46,6 +40,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#0366d6",
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10,
   },
   numberText: {
     color: "#fff",

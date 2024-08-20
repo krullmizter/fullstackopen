@@ -1,9 +1,10 @@
 import React from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
+import theme from "./theme";
 
 const Loading = () => (
   <View style={styles.container}>
-    <ActivityIndicator size="large" color="#0366d6" />
+    <ActivityIndicator size="large" color={theme.colors.primary} />
   </View>
 );
 

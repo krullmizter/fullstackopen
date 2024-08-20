@@ -1,21 +1,18 @@
 import React from "react";
 import { View, Image, Pressable, StyleSheet } from "react-native";
-import theme from "./theme";
+import theme, { cardStyles } from "./theme";
 import CustomText from "./CustomText";
 import * as Linking from "expo-linking";
 
 const styles = StyleSheet.create({
   container: {
-    padding: theme.padding.medium,
-    backgroundColor: theme.colors.white,
-    maxWidth: 500,
-    borderRadius: 5,
-    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+    ...cardStyles.container,
     marginBottom: theme.padding.medium,
+    maxWidth: "100%",
   },
   avatar: {
-    width: 50,
-    height: 50,
+    width: 60,
+    height: 60,
     borderRadius: 5,
   },
   infoContainer: {
@@ -37,20 +34,22 @@ const styles = StyleSheet.create({
   countsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: theme.padding.small,
+    marginTop: theme.padding.medium,
   },
   countItem: {
     alignItems: "center",
   },
   button: {
-    backgroundColor: "#0366d6",
-    padding: 10,
+    backgroundColor: theme.colors.primary,
+    padding: theme.padding.small,
     borderRadius: 5,
     alignItems: "center",
     marginTop: theme.padding.medium,
+    minHeight: 48,
+    justifyContent: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: theme.colors.white,
     fontWeight: "bold",
   },
 });
@@ -75,10 +74,10 @@ const RepoItem = ({ repository, showGitHubButton }) => {
           style={styles.avatar}
         />
         <View style={styles.details}>
-          <CustomText testID="fullName">
+          <CustomText testID="fullName" numberOfLines={1}>
             {repository.fullName || <CustomText>"N/A"</CustomText>}
           </CustomText>
-          <CustomText testID="description">
+          <CustomText testID="description" numberOfLines={2}>
             {repository.description || (
               <CustomText>"No description available"</CustomText>
             )}

@@ -17,12 +17,14 @@ const useSignIn = () => {
       if (data?.authenticate) {
         await authStorage.setAccessToken(data.authenticate.accessToken);
         await apolloClient.resetStore();
+
+        return data;
       }
 
-      return data;
+      return null;
     } catch (error) {
       console.error("Sign-in failed:", error);
-      throw error; 
+      throw error;
     }
   };
 

@@ -1,18 +1,13 @@
 import React, { useState } from "react";
-import { Platform } from "react-native";
 import { useQuery } from "@apollo/client";
 import { FlatList } from "react-native";
 import { Repository } from "../graphql/queries";
 import RepoItem from "./RepoItem";
 import Review from "./Review";
 import CustomText from "./CustomText";
+import { usePlatformParams } from "../utils/usePlatformParams";
 
-let useParams;
-if (Platform.OS === "web") {
-  useParams = require("react-router-dom").useParams;
-} else {
-  useParams = require("react-router-native").useParams;
-}
+const useParams = usePlatformParams();
 
 const SingleRepository = () => {
   const { id } = useParams();

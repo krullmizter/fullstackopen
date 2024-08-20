@@ -1,127 +1,134 @@
 import React from "react";
-import {
-  View,
-  TextInput,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+import { View, TextInput, Pressable, ActivityIndicator } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useNavigate } from "react-router-native";
+import { showMessage } from "react-native-flash-message";
+import useSignIn from "../hooks/useSignIn";
 import CustomText from "./CustomText";
-import theme from "./theme";
+import { formStyles, theme } from "./theme";
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required("Username is required"),
   password: Yup.string().required("Password is required"),
 });
 
-const SignInForm = ({ onSubmit }) => (
-  <Formik
-    initialValues={{ username: "", password: "" }}
-    onSubmit={onSubmit}
-    validationSchema={validationSchema}
-  >
-    {({
-      handleChange,
-      handleSubmit,
-      values,
-      errors,
-      touched,
-      setFieldTouched,
-      isSubmitting,
-    }) => (
-      <View style={styles.container}>
-        <TextInput
-          placeholder="Username"
-          style={[
-            styles.input,
-            touched.username && errors.username ? styles.inputError : null,
-          ]}
-          onChangeText={handleChange("username")}
-          onBlur={() => setFieldTouched("username")}
-          value={values.username}
-          readOnly={isSubmitting}
-          testID="usernameField"
-        />
-        {touched.username && errors.username && (
-          <CustomText style={styles.errorText}>{errors.username}</CustomText>
-        )}
+const SignInForm = () => {
+  const [signIn] = useSignIn();
+  const navigate = useNavigate();
 
-        <TextInput
-          placeholder="Password"
-          style={[
-            styles.input,
-            touched.password && errors.password ? styles.inputError : null,
-          ]}
-          secureTextEntry
-          onChangeText={handleChange("password")}
-          onBlur={() => setFieldTouched("password")}
-          value={values.password}
-          readOnly={isSubmitting}
-          testID="passwordField"
-        />
-        {touched.password && errors.password && (
-          <CustomText style={styles.errorText}>{errors.password}</CustomText>
-        )}
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const { username, password } = values;
 
-        <Pressable
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-          style={({ pressed }) => [
-            styles.button,
-            pressed ? styles.buttonPressed : null,
-            isSubmitting ? styles.buttonDisabled : null,
-          ]}
-          testID="submitButton"
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color={theme.colors.textLight} />
-          ) : (
-            <CustomText style={styles.buttonText}>Sign In</CustomText>
+    try {
+      const { data } = await signIn({ username, password });
+
+      console.log(data);
+
+      if (data && data.authenticate) {
+        console.log("Sign-in successful:", data);
+        showMessage({
+          message: "Login Successful!",
+          type: "success",
+        });
+        navigate("/");
+
+        setSubmitting(false);
+      } else {
+        console.log("No authenticate data returned after sign-in.");
+        showMessage({
+          message: "Sign-in failed. Please check your credentials.",
+          type: "danger",
+        });
+        setSubmitting(false);
+      }
+    } catch (e) {
+      console.error("Login error:", e);
+      showMessage({
+        message: "An error occurred during sign-in.",
+        type: "danger",
+      });
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Formik
+      initialValues={{ username: "", password: "" }}
+      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
+    >
+      {({
+        handleChange,
+        handleSubmit,
+        values,
+        errors,
+        touched,
+        setFieldTouched,
+        isSubmitting,
+      }) => (
+        <View style={formStyles.container}>
+          <TextInput
+            placeholder="Username"
+            style={[
+              formStyles.input,
+              touched.username && errors.username
+                ? formStyles.inputError
+                : null,
+            ]}
+            onChangeText={handleChange("username")}
+            onBlur={() => setFieldTouched("username")}
+            value={values.username}
+            editable={!isSubmitting}
+            testID="usernameField"
+          />
+          {touched.username && errors.username && (
+            <CustomText style={formStyles.errorText}>
+              {errors.username}
+            </CustomText>
           )}
-        </Pressable>
-      </View>
-    )}
-  </Formik>
-);
 
-const styles = StyleSheet.create({
-  container: {
-    padding: theme.padding.medium,
-    backgroundColor: theme.colors.white,
-  },
-  input: {
-    height: 40,
-    borderColor: theme.colors.textSecondary,
-    borderWidth: 1,
-    marginBottom: theme.padding.small,
-    paddingHorizontal: theme.padding.small,
-    borderRadius: 5,
-  },
-  inputError: {
-    borderColor: theme.colors.error,
-  },
-  errorText: {
-    color: theme.colors.error,
-    marginBottom: theme.padding.small,
-  },
-  button: {
-    backgroundColor: theme.colors.primary,
-    padding: theme.padding.medium,
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  buttonPressed: {
-    backgroundColor: theme.colors.primaryDark,
-  },
-  buttonDisabled: {
-    backgroundColor: theme.colors.primaryLight,
-  },
-  buttonText: {
-    color: theme.colors.textLight,
-    fontWeight: "bold",
-  },
-});
+          <TextInput
+            placeholder="Password"
+            style={[
+              formStyles.input,
+              touched.password && errors.password
+                ? formStyles.inputError
+                : null,
+            ]}
+            secureTextEntry
+            onChangeText={handleChange("password")}
+            onBlur={() => setFieldTouched("password")}
+            value={values.password}
+            editable={!isSubmitting}
+            testID="passwordField"
+          />
+          {touched.password && errors.password && (
+            <CustomText style={formStyles.errorText}>
+              {errors.password}
+            </CustomText>
+          )}
+
+          <Pressable
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            style={({ pressed }) => [
+              formStyles.button,
+              pressed ? formStyles.buttonPressed : null,
+              isSubmitting ? formStyles.buttonDisabled : null,
+            ]}
+            testID="submitButton"
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color={theme.colors.textLight} />
+            ) : (
+              <CustomText style={formStyles.buttonText}>Sign In</CustomText>
+            )}
+          </Pressable>
+        </View>
+      )}
+    </Formik>
+  );
+};
 
 export default SignInForm;

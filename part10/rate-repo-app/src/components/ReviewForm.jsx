@@ -1,12 +1,13 @@
 import React from "react";
-import { View, StyleSheet, Pressable, TextInput } from "react-native";
+import { View, TextInput, Pressable } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useMutation } from "@apollo/client";
 import { CREATE_REVIEW } from "../graphql/mutations";
 import CustomText from "./CustomText";
-import theme from "./theme";
+import { formStyles } from "./theme";
 import { useNavigate } from "react-router-native";
+import { showMessage } from "react-native-flash-message";
 
 const validationSchema = Yup.object().shape({
   ownerName: Yup.string().required("Repository owner name is required"),
@@ -36,11 +37,19 @@ const ReviewForm = () => {
       });
 
       if (data?.createReview?.repositoryId) {
+        showMessage({
+          message: "Review Submitted Successfully!",
+          type: "success",
+        });
         navigate(`/repository/${data.createReview.repositoryId}`);
         resetForm();
       }
     } catch (error) {
       console.error("Error creating review:", error);
+      showMessage({
+        message: "Failed to submit the review. Please try again.",
+        type: "danger",
+      });
     }
   };
 
@@ -63,54 +72,74 @@ const ReviewForm = () => {
         errors,
         touched,
       }) => (
-        <View style={styles.container}>
+        <View style={formStyles.container}>
           <TextInput
             placeholder="Repository owner name"
             onChangeText={handleChange("ownerName")}
             onBlur={handleBlur("ownerName")}
             value={values.ownerName}
-            style={styles.input}
-            error={touched.ownerName && errors.ownerName}
+            style={[
+              formStyles.input,
+              touched.ownerName && errors.ownerName
+                ? formStyles.inputError
+                : null,
+            ]}
           />
           {touched.ownerName && errors.ownerName && (
-            <CustomText style={styles.errorText}>{errors.ownerName}</CustomText>
+            <CustomText style={formStyles.errorText}>
+              {errors.ownerName}
+            </CustomText>
           )}
+
           <TextInput
             placeholder="Repository name"
             onChangeText={handleChange("repositoryName")}
             onBlur={handleBlur("repositoryName")}
             value={values.repositoryName}
-            style={styles.input}
-            error={touched.repositoryName && errors.repositoryName}
+            style={[
+              formStyles.input,
+              touched.repositoryName && errors.repositoryName
+                ? formStyles.inputError
+                : null,
+            ]}
           />
           {touched.repositoryName && errors.repositoryName && (
-            <CustomText style={styles.errorText}>
+            <CustomText style={formStyles.errorText}>
               {errors.repositoryName}
             </CustomText>
           )}
+
           <TextInput
             placeholder="Rating between 0 and 100"
             onChangeText={handleChange("rating")}
             onBlur={handleBlur("rating")}
             value={values.rating}
-            style={styles.input}
+            style={[
+              formStyles.input,
+              touched.rating && errors.rating ? formStyles.inputError : null,
+            ]}
             keyboardType="numeric"
-            error={touched.rating && errors.rating}
           />
           {touched.rating && errors.rating && (
-            <CustomText style={styles.errorText}>{errors.rating}</CustomText>
+            <CustomText style={formStyles.errorText}>
+              {errors.rating}
+            </CustomText>
           )}
+
           <TextInput
             placeholder="Review"
             onChangeText={handleChange("text")}
             onBlur={handleBlur("text")}
             value={values.text}
-            style={styles.input}
+            style={[
+              formStyles.input,
+              touched.text && errors.text ? formStyles.inputError : null,
+            ]}
             multiline
-            error={touched.text && errors.text}
           />
-          <Pressable onPress={handleSubmit} style={styles.submitButton}>
-            <CustomText style={styles.submitButtonText}>
+
+          <Pressable onPress={handleSubmit} style={formStyles.button}>
+            <CustomText style={formStyles.buttonText}>
               Create a review
             </CustomText>
           </Pressable>
@@ -119,34 +148,5 @@ const ReviewForm = () => {
     </Formik>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    padding: theme.padding.medium,
-    backgroundColor: theme.colors.white,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.textSecondary,
-    borderRadius: 5,
-    padding: theme.padding.small,
-    marginBottom: theme.padding.small,
-  },
-  errorText: {
-    color: theme.colors.error,
-    marginBottom: theme.padding.small,
-  },
-  submitButton: {
-    backgroundColor: theme.colors.primary,
-    padding: theme.padding.medium,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: theme.padding.medium,
-  },
-  submitButtonText: {
-    color: theme.colors.white,
-    fontWeight: "bold",
-  },
-});
 
 export default ReviewForm;

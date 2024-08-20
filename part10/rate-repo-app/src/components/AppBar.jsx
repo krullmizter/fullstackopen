@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { View, ScrollView, Pressable, StyleSheet } from "react-native";
 import { Link } from "react-router-native";
 import { useApolloClient, useQuery } from "@apollo/client";
@@ -13,7 +13,7 @@ const AppBar = () => {
   const apolloClient = useApolloClient();
   const authStorage = useAuthStorage();
 
-  const isAuthenticated = useMemo(() => !!data?.me, [data]);
+  const isAuthenticated = !!data?.me;
 
   const handleSignOut = async () => {
     try {
@@ -26,7 +26,7 @@ const AppBar = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView role="tablist" style={styles.scrollView}>
+      <ScrollView horizontal style={styles.scrollView}>
         <Link to="/" component={Pressable} style={styles.tab}>
           <CustomText style={styles.text}>Repositories</CustomText>
         </Link>
@@ -63,9 +63,15 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.colors.primary,
     paddingBottom: theme.padding.small,
+    elevation: 4,
+    shadowColor: theme.colors.shadowColor,
+    shadowOffset: theme.shadowOffset,
+    shadowOpacity: theme.shadowOpacity,
+    shadowRadius: theme.shadowRadius,
   },
   scrollView: {
     flexDirection: "row",
+    paddingHorizontal: theme.padding.medium,
   },
   tab: {
     paddingHorizontal: theme.padding.medium,
@@ -75,6 +81,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: theme.colors.white,
+    fontWeight: theme.fontWeights.bold,
   },
 });
 

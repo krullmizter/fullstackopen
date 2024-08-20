@@ -4,29 +4,27 @@ import { useQuery, useMutation } from "@apollo/client";
 import { ME } from "../graphql/queries";
 import { DELETE_REVIEW } from "../graphql/mutations";
 import CustomText from "./CustomText";
-import theme from "./theme";
+import theme, { formStyles, cardStyles } from "./theme";
 import { useNavigate } from "react-router-native";
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
-    backgroundColor: theme.colors.white,
-    marginBottom: 10,
+    ...cardStyles.container,
   },
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 10,
+    marginTop: theme.padding.small,
   },
   button: {
-    padding: 10,
+    padding: theme.padding.small,
     borderRadius: 5,
     alignItems: "center",
     flexGrow: 1,
   },
   viewButton: {
     backgroundColor: theme.colors.primary,
-    marginRight: 10,
+    marginRight: theme.padding.small,
   },
   deleteButton: {
     backgroundColor: theme.colors.error,
@@ -51,8 +49,6 @@ const ReviewItem = ({ review, refetch }) => {
   const [deleteReview] = useMutation(DELETE_REVIEW);
 
   const handleDelete = () => {
-    console.log("Delete button pressed for review ID:", review.id);
-
     if (Platform.OS === "web") {
       const confirmed = confirm("Are you sure you want to delete this review?");
       if (confirmed) {
@@ -67,7 +63,7 @@ const ReviewItem = ({ review, refetch }) => {
           {
             text: "Delete",
             style: "destructive",
-            onPress: performDelete, 
+            onPress: performDelete,
           },
         ]
       );
@@ -76,15 +72,9 @@ const ReviewItem = ({ review, refetch }) => {
 
   const performDelete = async () => {
     try {
-      console.log("Delete button pressed for review ID:", review.id);
-      const { data } = await deleteReview({
-        variables: { id: review.id },
-      });
-
-      console.log("Delete mutation response:", data);
+      const { data } = await deleteReview({ variables: { id: review.id } });
 
       if (data?.deleteReview) {
-        console.log("Review deleted successfully"); 
         refetch();
       } else {
         Alert.alert("Error", "Failed to delete the review.");
