@@ -10,10 +10,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     maxWidth: 500,
     borderRadius: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
     marginBottom: theme.padding.medium,
   },
   avatar: {

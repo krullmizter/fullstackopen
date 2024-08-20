@@ -24,10 +24,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: 10,
     borderRadius: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
   },
   header: {
     flexDirection: "row",
