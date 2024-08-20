@@ -1,16 +1,30 @@
 import { gql } from "@apollo/client";
 
 export const ME = gql`
-  query {
+  query getCurrentUser($includeReviews: Boolean = false) {
     me {
       id
       username
+      reviews @include(if: $includeReviews) {
+        edges {
+          node {
+            id
+            text
+            rating
+            createdAt
+            repository {
+              id
+              fullName
+            }
+          }
+        }
+      }
     }
   }
 `;
 
 export const Repository = gql`
-  query Repository($id: ID!) {
+  query Repository($id: ID!, $first: Int!, $after: String) {
     repository(id: $id) {
       id
       fullName
@@ -22,7 +36,7 @@ export const Repository = gql`
       reviewCount
       ownerAvatarUrl
       url
-      reviews {
+      reviews(first: $first, after: $after) {
         edges {
           node {
             id
@@ -34,6 +48,11 @@ export const Repository = gql`
               username
             }
           }
+          cursor
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
         }
       }
     }

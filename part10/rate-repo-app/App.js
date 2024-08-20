@@ -16,7 +16,7 @@ const App = () => {
       <ApolloProvider client={apolloClient}>
         <AuthStorageContext.Provider value={authStorage}>
           <Main />
-          <FlashMessage position="top" floating={true} />{" "}
+          <FlashMessage position="top" floating={true} />
         </AuthStorageContext.Provider>
       </ApolloProvider>
     </NativeRouter>

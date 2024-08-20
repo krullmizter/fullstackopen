@@ -76,13 +76,15 @@ const RepoItem = ({ repository, showGitHubButton }) => {
         />
         <View style={styles.details}>
           <CustomText testID="fullName">
-            {repository.fullName || "N/A"}
+            {repository.fullName || <CustomText>"N/A"</CustomText>}
           </CustomText>
           <CustomText testID="description">
-            {repository.description || "No description available"}
+            {repository.description || (
+              <CustomText>"No description available"</CustomText>
+            )}
           </CustomText>
           <CustomText style={styles.languageTag} testID="language">
-            {repository.language || "Unknown"}
+            {repository.language || <CustomText>"Unknown"</CustomText>}
           </CustomText>
         </View>
       </View>

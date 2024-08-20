@@ -25,7 +25,7 @@ const validationSchema = Yup.object().shape({
 
 const SignUpForm = () => {
   const [createUser] = useMutation(CREATE_USER);
-  const [signIn] = useSignIn(); // <-- Destructure the signIn function from the hook
+  const [signIn] = useSignIn();
   const navigate = useNavigate();
 
   const handleSubmit = async (values, { resetForm }) => {
