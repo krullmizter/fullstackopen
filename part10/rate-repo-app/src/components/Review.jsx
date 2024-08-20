@@ -12,7 +12,9 @@ const Review = ({ review }) => {
           {format(new Date(review.createdAt), "dd.MM.yyyy")}
         </CustomText>
       </View>
-      <CustomText style={styles.rating}>{review.rating}</CustomText>
+      <View style={styles.numberCircle}>
+        <CustomText style={styles.numberText}>{review.rating}</CustomText>
+      </View>
       <CustomText>{review.text}</CustomText>
     </View>
   );
@@ -37,10 +39,17 @@ const styles = StyleSheet.create({
   date: {
     color: "#888",
   },
-  rating: {
+  numberCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#0366d6",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  numberText: {
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 5,
   },
 });
 
