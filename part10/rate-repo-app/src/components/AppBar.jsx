@@ -30,14 +30,25 @@ const AppBar = () => {
         <Link to="/" component={Pressable} style={styles.tab}>
           <CustomText style={styles.text}>Repositories</CustomText>
         </Link>
-        {isAuthenticated ? (
-          <Pressable onPress={handleSignOut} style={styles.tab}>
-            <CustomText style={styles.text}>Sign Out</CustomText>
-          </Pressable>
-        ) : (
-          <Link to="/signin" component={Pressable} style={styles.tab}>
-            <CustomText style={styles.text}>Sign In</CustomText>
-          </Link>
+        {isAuthenticated && (
+          <>
+            <Link to="/create-review" component={Pressable} style={styles.tab}>
+              <CustomText style={styles.text}>Create a Review</CustomText>
+            </Link>
+            <Pressable onPress={handleSignOut} style={styles.tab}>
+              <CustomText style={styles.text}>Sign Out</CustomText>
+            </Pressable>
+          </>
+        )}
+        {!isAuthenticated && (
+          <>
+            <Link to="/signin" component={Pressable} style={styles.tab}>
+              <CustomText style={styles.text}>Sign In</CustomText>
+            </Link>
+            <Link to="/signup" component={Pressable} style={styles.tab}>
+              <CustomText style={styles.text}>Sign Up</CustomText>
+            </Link>
+          </>
         )}
       </ScrollView>
     </View>

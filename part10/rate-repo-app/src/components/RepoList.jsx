@@ -1,79 +1,85 @@
-import React from "react";
-import { Pressable, FlatList, View, StyleSheet } from "react-native";
+import React, { useState, useMemo } from "react";
+import { View, FlatList, StyleSheet, TextInput, Pressable } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import { useDebounce } from "use-debounce";
 import { useNavigate } from "react-router-native";
 import RepoItem from "./RepoItem";
+import useRepositories from "../hooks/useRepositories";
 
 const styles = StyleSheet.create({
   separator: {
     height: 10,
   },
+  searchInput: {
+    padding: 10,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    margin: 10,
+    borderRadius: 5,
+  },
 });
-
-const repositories = [
-  {
-    id: "jaredpalmer.formik",
-    fullName: "jaredpalmer/formik",
-    description: "Build forms in React, without the tears",
-    language: "TypeScript",
-    forksCount: 1589,
-    stargazersCount: 21553,
-    ratingAverage: 88,
-    reviewCount: 4,
-    ownerAvatarUrl: "https://avatars2.githubusercontent.com/u/4060187?v=4",
-  },
-  {
-    id: "rails.rails",
-    fullName: "rails/rails",
-    description: "Ruby on Rails",
-    language: "Ruby",
-    forksCount: 18349,
-    stargazersCount: 45377,
-    ratingAverage: 100,
-    reviewCount: 2,
-    ownerAvatarUrl: "https://avatars1.githubusercontent.com/u/4223?v=4",
-  },
-  {
-    id: "django.django",
-    fullName: "django/django",
-    description: "The Web framework for perfectionists with deadlines.",
-    language: "Python",
-    forksCount: 21015,
-    stargazersCount: 48496,
-    ratingAverage: 73,
-    reviewCount: 5,
-    ownerAvatarUrl: "https://avatars2.githubusercontent.com/u/27804?v=4",
-  },
-  {
-    id: "reduxjs.redux",
-    fullName: "reduxjs/redux",
-    description: "Predictable state container for JavaScript apps",
-    language: "TypeScript",
-    forksCount: 13902,
-    stargazersCount: 52869,
-    ratingAverage: 0,
-    reviewCount: 0,
-    ownerAvatarUrl: "https://avatars3.githubusercontent.com/u/13142323?v=4",
-  },
-];
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
 const RepoList = () => {
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [sortBy, setSortBy] = useState("CREATED_AT");
+  const [orderDirection, setOrderDirection] = useState("DESC");
+  const [debouncedSearchKeyword] = useDebounce(searchKeyword, 500);
   const navigate = useNavigate();
+
+  const { repositories, loading } = useRepositories(
+    sortBy,
+    orderDirection,
+    debouncedSearchKeyword
+  );
+
+  const handleRepoPress = (id) => {
+    navigate(`/repository/${id}`);
+  };
+
+  const renderHeader = useMemo(
+    () => (
+      <View>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          value={searchKeyword}
+          onChangeText={setSearchKeyword}
+        />
+        <Picker
+          selectedValue={`${sortBy},${orderDirection}`}
+          onValueChange={(value) => {
+            const [newSortBy, newOrderDirection] = value.split(",");
+            setSortBy(newSortBy);
+            setOrderDirection(newOrderDirection);
+          }}
+        >
+          <Picker.Item label="Latest repositories" value="CREATED_AT,DESC" />
+          <Picker.Item
+            label="Highest rated repositories"
+            value="RATING_AVERAGE,DESC"
+          />
+          <Picker.Item
+            label="Lowest rated repositories"
+            value="RATING_AVERAGE,ASC"
+          />
+        </Picker>
+      </View>
+    ),
+    [searchKeyword, sortBy, orderDirection]
+  );
 
   return (
     <FlatList
       data={repositories}
       ItemSeparatorComponent={ItemSeparator}
+      ListHeaderComponent={renderHeader}
       renderItem={({ item }) => (
-        <Pressable onPress={() => navigate(`/repository/${item.id}`)}>
+        <Pressable onPress={() => handleRepoPress(item.id)}>
           <RepoItem repository={item} />
         </Pressable>
       )}
-      keyExtractor={(item) => item.id}
-      initialNumToRender={10}
-      maxToRenderPerBatch={5}
-      windowSize={10}
     />
   );
 };

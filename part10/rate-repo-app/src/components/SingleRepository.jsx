@@ -9,7 +9,10 @@ import CustomText from "./CustomText";
 
 const SingleRepository = () => {
   const { id } = useParams();
-  const { data, loading } = useQuery(Repository, { variables: { id } });
+  const { data, loading } = useQuery(Repository, {
+    variables: { id },
+    fetchPolicy: "cache-and-network",
+  });
 
   if (loading) {
     return <CustomText>Loading...</CustomText>;

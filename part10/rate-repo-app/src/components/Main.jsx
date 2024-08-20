@@ -5,6 +5,9 @@ import AppBar from "./AppBar";
 import RepoList from "./RepoList";
 import SignIn from "./SignIn";
 import SingleRepository from "./SingleRepository";
+import ReviewForm from "./ReviewForm";
+import SignUpForm from "./SignUpForm";
+import ErrorBoundary from "./ErrorBoundary";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,15 +18,19 @@ const styles = StyleSheet.create({
 
 const Main = () => {
   return (
-    <View style={styles.container}>
-      <AppBar />
-      <Routes>
-        <Route path="/" element={<RepoList />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/repository/:id" element={<SingleRepository />} />
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </View>
+    <ErrorBoundary>
+      <View style={styles.container}>
+        <AppBar />
+        <Routes>
+          <Route path="/" element={<RepoList />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUpForm />} />
+          <Route path="/repository/:id" element={<SingleRepository />} />
+          <Route path="/create-review" element={<ReviewForm />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </View>
+    </ErrorBoundary>
   );
 };
 
