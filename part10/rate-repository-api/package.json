@@ -37,7 +37,7 @@
     "@apollo/client": "^3.11.4",
     "@expo/metro-config": "^0.17.4",
     "@koa/cors": "^5.0.0",
-    "apollo-server": "^3.3.0",
+    "apollo-server": "^3.13.0",
     "apollo-server-core": "^3.3.0",
     "apollo-server-koa": "^3.3.0",
     "axios": "^1.12.1",
