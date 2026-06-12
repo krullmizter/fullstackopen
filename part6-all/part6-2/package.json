@@ -22,12 +22,12 @@
     "redux-thunk": "^2.4.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^8.45.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
-    "vite": "^7.3.2"
+    "vite": "^8.0.16"
   },
   "eslintConfig": {
     "extends": [
